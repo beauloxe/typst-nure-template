@@ -7,7 +7,7 @@
 1. **Typst 0.15 або новіший.** Пакунок використовує тип `path`, якого немає в старіших версіях.
 2. **Версія в імпорті:** `@vendor/nure:0.3.0` або `@local/nure:0.3.0`.
 3. **mise:** у `.mise/config.toml` змініть `nure_package_ref = "0.3.0"`, `nure_package_repo = "https://github.com/beauloxe/typst-nure-template.git"` і виконайте `mise run update-package-rev`. Найпростіше -- взяти новий [template/mise/.mise/config.toml](../template/mise/.mise/config.toml) цілком.
-4. **Рисунки:** якщо використовуєте `utils.img` з пакунка, обгорніть шлях у `path()`: `utils.img(path("figures/a.png"), [...])`. Локальну копію `img` у своєму `utils.typ` можна прибрати й використовувати `utils.img` -- або лишити, вона працює як раніше.
+4. **Рисунки:** `img` тепер `dstu-figure` з пакунка, шлях обгортається в `path()`: `dstu-figure(path("figures/a.png"), [...], label: <a>)`. Мітка з назви файлу більше не утворюється: якщо посилалися на `@figures_a`, додайте `label: <figures_a>`. Локальну копію `img` у своєму `utils.typ` можна прибрати -- або лишити, вона працює як раніше.
 5. **Перелік джерел:** `bib-path: bytes(read("bibl.yml"))` можна замінити на `bib-path: path("bibl.yml")` (старий варіант теж працює). Якщо викликали `dstu-bibliography` напряму, стиль і заголовок тепер передаються за назвою: `dstu-bibliography(path("bibl.yml"), style: "3008")`.
 6. **Свої дисципліни:** замість правок `universities.yaml` у пакунку (патчів) -- `data.yaml` у проєкті, див. [Дані роботи](data.md#власні-дисципліни-й-університети).
 
@@ -51,4 +51,5 @@
 ## Прибрано
 
 - `tp` (внутрішні функції титульних сторінок) більше не експортується -- використовуйте `report`, `cw`, `cw-v2`.
-- `template/default/utils.typ` з локальною копією `img` -- замість неї `utils.img` з пакунка.
+- `template/default/utils.typ` з локальною копією `img` -- замість неї `dstu-figure` з пакунка.
+- `utils.img-label` і `utils.path-str` -- мітку рисунка задавайте явно через `label:`.

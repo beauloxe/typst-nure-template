@@ -19,7 +19,7 @@
 /// Корисні фрагменти
 
 /// Рисунок: назву файлу обгортаємо в `path()`
-// #img(path("figures/clojure-logo.png"), [Логотип Clojure], "clojure.org")
+// #dstu-figure(path("figures/clojure-logo.png"), [Логотип Clojure], "clojure.org", label: <clojure-logo>)
 
 /// Таблиця з .csv
 // #figure(

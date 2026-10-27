@@ -10,7 +10,7 @@ src/
 ├── work.typ              -- work(): нормалізація даних роботи
 ├── recipes.typ           -- pz-lb, coursework, coursework-v2 як композиції блоків
 ├── style.typ             -- style.dstu (зокрема оформлення таблиць), style.appendices, dstu-table
-├── utils.typ             -- utils.*: img, nheading, uline, ...
+├── utils.typ             -- utils.*: dstu-figure, nheading, uline, ...
 ├── helpers.typ           -- дрібні чисті функції: gender-form, group-form, deep-merge, ...
 ├── shared.typ            -- вбудовані дані (universities)
 ├── config/universities.yaml
@@ -40,7 +40,7 @@ docs/                     -- ця документація
 
 - `pz-lb.typ`, `pz-lb-complex.typ`, `coursework.typ`, `coursework-v2.typ` -- рецепти;
 - `constructor-*.typ` -- ті самі документи, зібрані з блоків; CI рендерить обидва варіанти в PNG і перевіряє, що вони ідентичні;
-- `constructor-features.typ`, `utils-img.typ`, `work-data.typ` -- слоти, рисунки, власні дані й чисті функції (через `assert`);
+- `constructor-features.typ`, `dstu-figure.typ`, `work-data.typ` -- слоти, рисунки, власні дані й чисті функції (через `assert`);
 - `tables.typ` -- оформлення таблиць: перенос довгих таблиць, напис, додатки, а також що таблиця користувача лишається незмінною (координати комірок, `hline`, `fill`-функції, `set`/`show`-правила); `dstu-table.typ` і `constructor-dstu-table.typ` -- `dstu-table` і рівнозначний `figure(table(...))`, мають рендеритися однаково.
 
 Крім того, CI збирає шаблони `template/default/*` і `template/mise` з поточним кодом пакунка й перевіряє, що mise-шаблон посилається на версію з `typst.toml`.

@@ -66,7 +66,7 @@
 Зміст до другого рівня заголовків. `compact-appendices: true` -- додатки як «Додаток А Назва» без підрозділів.
 
 ### `dstu-bibliography(source, style: "3008", title: [Перелік джерел посилання], full: true)`
-Перелік джерел. `source` -- `path("bibl.yml")` або байти; `style` -- `"3008"`, `"8302"` або власний CSL як байти; `full: false` -- лише процитовані. Див. [Перелік джерел](writing.md#перелік-джерел).
+Перелік джерел (коротко -- `bib`). `source` -- `path("bibl.yml")` або байти; `style` -- `"3008"`, `"8302"` або власний CSL як байти; `full: false` -- лише процитовані. Див. [Перелік джерел](writing.md#перелік-джерел).
 
 ### `doc-stats()`
 Підсумки документа: «N с., N табл., N рис., N джерел» (нульові пропускаються).
@@ -77,10 +77,10 @@
 ## Таблиці й рисунки
 
 ### `dstu-table(caption:, columns:, header:, label: none, tag: none, ..args)`
-Скорочення для `figure(table(table.header(..header), ..args), caption: caption)`. `header` -- масив комірок шапки, `label` -- мітка (`<x>`), `tag` -- те саме рядком (для сумісності); решта передається в `table`. Перенос з «Продовження таблиці» `style.dstu` оформлює для будь-якої таблиці-`figure`. Див. [Таблиці](writing.md#таблиці).
+Скорочення для `figure(table(table.header(..header), ..args), caption: caption)` (ще коротше -- `tab`). `header` -- масив комірок шапки, `label` -- мітка (`<x>`), `tag` -- те саме рядком (для сумісності); решта передається в `table`. Перенос з «Продовження таблиці» `style.dstu` оформлює для будь-якої таблиці-`figure`. Див. [Таблиці](writing.md#таблиці).
 
-### `utils.img(file, caption, source, label: auto, ..args)`
-Рисунок з підписом і міткою з назви файлу. `file` -- `path(...)`; `source` (необов'язковий третій аргумент): не вказано -- «(рисунок виконано самостійно)», рядок -- «(за даними …)», `()` -- без примітки. Див. [Рисунки](writing.md#рисунки).
+### `dstu-figure(file, caption, source, label: none, ..args)`
+Рисунок з підписом і приміткою про джерело (коротко -- `fig`). `file` -- `path(...)`; `source` (необов'язковий третій аргумент): не вказано або `()` -- без примітки, `none` -- «(рисунок виконано самостійно)», рядок -- «(за даними …)»; `label` -- мітка (`<x>`), без неї рисунок без мітки; решта передається в `image`. Є й як `utils.dstu-figure`. Див. [Рисунки](writing.md#рисунки).
 
 ## Утиліти: `utils`
 
@@ -92,9 +92,7 @@
 | `utils.hfill(width)` / `hfill(width)` | Невидимий текст заданої ширини, щоб підкреслення тяглося |
 | `utils.filled-lines(lines)` | Масив рядків → рядки, заповнені до кінця (для підкреслених полів) |
 | `utils.ruled-field(value)` | Поле, де підкреслено кожен рядок при переносі |
-| `utils.img-label(file)` | Мітка з шляху: `figures/a.png` → `<figures_a>` |
 | `utils.img-caption(caption, source)` | Підпис з приміткою про джерело |
-| `utils.path-str(file)` | Текст значення `path` |
 
 ## Поля форм: `forms`
 Будівельні блоки офіційних сторінок для власних: `forms.note`, `forms.form-field`, `forms.label-line`, `forms.inline-label-line`, `forms.task-head-fields`, `forms.task-num`, `forms.title-field`, `forms.commission-lines`. Див. [Розширення](extending.md).

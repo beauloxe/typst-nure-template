@@ -1,9 +1,3 @@
-#import "@vendor/nure:0.3.0": utils
-
-/// рисунок з підписом і міткою з назви файлу, див. `utils.img`
-/// Використання: img(path("figures/image.png"), [Підпис], "джерело" (необов’язково))
-#let img = utils.img
-
 /// блок коду з рядка, напр. #code(read("foo.c"))
 #let code(content) = raw(block: true, theme: none, content)
 

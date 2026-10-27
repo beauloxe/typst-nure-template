@@ -49,7 +49,7 @@
 #lorem(150)
 
 // Рисунки: назву файлу обгортаємо в `path()`, бо рядок шукався б у пакунку
-// #utils.img(path("figures/scheme.png"), [Схема дослідження]) // мітка <figures_scheme>, посилання @figures_scheme
+// #dstu-figure(path("figures/scheme.png"), [Схема дослідження], label: <scheme>) // посилання @scheme
 
 === Виконання дослідження
 #lorem(300)

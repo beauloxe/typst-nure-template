@@ -5,6 +5,7 @@
 #import "./utils.typ"
 
 #let dstu-table = style.dstu-table
+#let dstu-figure = utils.dstu-figure
 #let hfill = utils.hfill
 
 // Constructor: work data + parts, assembled by the author.
@@ -17,3 +18,8 @@
 
 // Recipes: whole documents assembled from the parts.
 #import "./recipes.typ": coursework, coursework-v2, pz-lb
+
+// Short aliases.
+#let tab = dstu-table
+#let fig = dstu-figure
+#let bib = dstu-bibliography

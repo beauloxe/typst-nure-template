@@ -62,44 +62,6 @@
   ]
 })
 
-// HACK: the `path` type (Typst 0.15) is opaque -- no methods, and `str()`
-// rejects it -- so the only way to get its text is `repr`, which prints
-// `path("/dir/file.png")` (project-rooted, normalized, `"` escaped). The
-// format is checked, so a change in a future Typst fails loudly instead of
-// producing wrong labels. Replace with a native accessor once one lands.
-/// Текст значення `path` ("/dir/file.png"); рядки повертаються як є
-#let path-str(file) = if type(file) == str { file } else {
-  let r = repr(file)
-  assert(
-    r.starts-with("path(\"") and r.ends-with("\")"),
-    message: "path-str: unexpected path repr " + r + "; pass `label:` explicitly",
-  )
-  r.slice(6, -2).replace("\\\"", "\"")
-}
-
-/// Назва файлу без розширення
-#let stem(file) = path-str(file).split("/").last().split(".").first()
-
-/// Назва батьківської теки
-#let parent-dir(file) = path-str(file).split("/").at(-2, default: "")
-
-/// Мітка з шляху до рисунка (рядок або `path`):
-/// - "image.png" → "image"
-/// - "img/foo/bar.png" → "foo_bar"
-#let img-label(file) = {
-  let name = stem(file)
-  let parent = parent-dir(file)
-
-  // If parent exists and name doesn't start with parent name, combine them
-  let base = if parent != "" and not name.starts-with(parent) {
-    parent + "_" + name
-  } else {
-    name
-  }
-
-  label(base.replace(" ", "_"))
-}
-
 /// Підпис рисунка з приміткою про джерело
 #let img-caption(base-caption, source) = {
   if source == none {
@@ -111,23 +73,22 @@
   }
 }
 
-/// рисунок з підписом і міткою, виведеною з назви файлу
-/// Використання: img(path("figures/image.png"), [Підпис], "джерело" (необов'язково))
+/// рисунок з підписом і приміткою про джерело
+/// Використання: dstu-figure(path("figures/image.png"), [Підпис], "джерело" (необов'язково), label: <x>)
 ///
 /// - file (path): Файл рисунка; саме `path`, бо рядок шукався б
 ///   у пакунку, а не у вашому проєкті
 /// - caption (content): Підпис рисунка
 /// - source (str, none): Джерело рисунка; `none` -- "(рисунок виконано самостійно)"
-/// - label (label, auto, none): Мітка рисунка, за замовчуванням з назви файлу
+/// - label (label, none): Мітка рисунка
 /// - ..args: Передаються в `image` (width, height, fit, ...)
-#let img(file, caption, ..args) = {
+#let dstu-figure(file, caption, ..args) = {
   if type(file) == str {
-    panic("img: pass `path(\"" + file + "\")` instead of a string, which would be looked up inside the package")
+    panic("dstu-figure: pass `path(\"" + file + "\")` instead of a string, which would be looked up inside the package")
   }
   let source = args.pos().at(0, default: ())
   let named = args.named()
-  let lbl = named.remove("label", default: auto)
-  let lbl = if lbl == auto { img-label(file) } else { lbl }
+  let lbl = named.remove("label", default: none)
 
   [#figure(image(file, ..named), caption: img-caption(caption, source)) #lbl]
 }
