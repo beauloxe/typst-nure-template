@@ -70,4 +70,4 @@ typstyle -l 120 -i src tests template
 
 - Розробка йде в `main`; mise-шаблон бере пакунок з `main` (`nure_package_ref = "main"`).
 - Версія задається в `typst.toml`; ті самі цифри мають бути в імпортах шаблонів і в `nure_package_ver` mise-шаблону (це перевіряє CI).
-- Після змін у `main` оновіть `nure_package_rev` у [template/mise/.mise/config.toml](../template/mise/.mise/config.toml) на новий коміт (`mise run update-package-rev` у копії шаблону або вручну).
+- `nure_package_rev` у [template/mise/.mise/config.toml](../template/mise/.mise/config.toml) оновлює хук [.githooks/pre-push](../.githooks/pre-push). Якщо шаблон закріплено на старішому коміті, `git push` у `main` додає коміт «template(mise): pin package to …» і зупиняється, тож треба виконати `git push` ще раз. Увімкнути хук (один раз після клонування): `git config core.hooksPath .githooks`. Пропустити: `git push --no-verify`.
