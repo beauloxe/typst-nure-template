@@ -8,9 +8,84 @@
 /// Українська абетка для нумерації за ДСТУ 3008:2015
 #let ukr-enum = "абвгдежиклмнпрстуфхцшщюя".clusters()
 
-#let dstu-table-counter = counter("dstu-table")
-#let dstu-table-appendix = state("dstu-table-appendix", none)
-#let dstu-table-caption-gap = 0.65em
+/// Номер поточного додатка (`none` поза додатками), для нумерації в посиланнях
+#let appendix-index = state("appendix-index", none)
+
+/// Відступ між підписом таблиці й таблицею та під написом «Продовження таблиці»
+#let table-caption-gap = 0.65em
+
+// Наскрізний номер таблиці в документі -- для унікальних ключів маркерів
+// початку й кінця таблиці (позиція фігури як ключ працює, але в рази повільніше).
+#let table-seq = counter("dstu-table-seq")
+
+// Напис над продовженням таблиці на новій сторінці; на першій її сторінці -- нічого.
+#let continuation-label(num, start-key, end-key) = context {
+  let start = query(metadata.where(value: start-key)).first().location().page()
+  if here().page() == start { return }
+  let end = query(metadata.where(value: end-key)).first().location().page()
+  set par(first-line-indent: 0pt)
+  block(inset: (bottom: table-caption-gap))[
+    #if here().page() == end [Кінець] else [Продовження] таблиці#if num != none [ #num]
+  ]
+}
+
+// Оформлення таблиці-`figure` за ДСТУ: підпис ліворуч над таблицею, перенос
+// між сторінками з написом «Продовження таблиці N». Таблиця користувача не
+// перебудовується, а обгортається в сітку з однією колонкою: шапка сітки
+// повторюється на кожній сторінці й несе напис, а єдина комірка -- сама
+// таблиця, як є. Тому номери рядків, явні аргументи, set- і show-правила
+// користувача не зачіпаються.
+#let table-figure(fig) = {
+  // плаваючу фігуру однаково не можна розірвати -- лишаємо як є
+  if fig.placement != none { return fig }
+
+  // номер цієї таблиці («1.2», «А.1»); обчислюється там, де стоїть напис
+  let num = if fig.numbering != none { fig.counter.display(fig.numbering) }
+
+  table-seq.step()
+  context {
+    let id = str(table-seq.get().first())
+    let (start-key, end-key) = ("dstu-table-start-" + id, "dstu-table-end-" + id)
+
+    // інтервали, які для інших фігур додає show-правило фігури в `dstu`
+    // (до цього виводу воно вже не застосовується)
+    v(double-spacing, weak: true)
+
+    if fig.caption != none {
+      block(sticky: true, below: fig.gap, width: 100%, {
+        set align(left)
+        set par(first-line-indent: 0pt)
+        fig.caption
+      })
+    }
+
+    metadata(start-key)
+    // Колонка на всю ширину тексту, щоб напис не переносився; таблиця в ній --
+    // від лівого краю. Решта значень явні, щоб `set grid(...)` користувача не
+    // зачепив обгортку.
+    grid(
+      columns: (100%,),
+      align: left,
+      stroke: none,
+      inset: 0pt,
+      fill: none,
+      gutter: 0pt,
+      grid.header(
+        repeat: true,
+        continuation-label(num, start-key, end-key),
+      ),
+      {
+        // У звичайному figure вміст комірок центрується, бо фігура вирівнює
+        // своє тіло по центру; відтворюємо це, якщо користувач не задав
+        // власного вирівнювання таблиці.
+        set table(align: center) if table.align == auto
+        fig.body
+      },
+    )
+    metadata(end-key)
+    v(double-spacing, weak: true)
+  }
+}
 
 /// Блок заголовків 2-го і 3-го рівнів
 #let heading-block(it, num: auto) = {
@@ -23,16 +98,6 @@
   v(double-spacing, weak: true)
 }
 
-#let _col-count(columns) = {
-  if type(columns) == int {
-    columns
-  } else if type(columns) == array {
-    columns.len()
-  } else {
-    panic("dstu-table: columns must be an int or array, e.g. 2 or (1fr, 3fr)")
-  }
-}
-
 #let _required(name, value) = {
   if value == none {
     panic("dstu-table: " + name + " is required")
@@ -40,106 +105,30 @@
   value
 }
 
-#let dstu-table-label(it) = {
-  set par(first-line-indent: 0pt)
-  align(left)[#it]
-}
-
-#let dstu-table(
-  caption: none,
-  columns: none,
-  header: none,
-  tag: none,
-  ..args,
-) = {
+/// Таблиця з підписом -- скорочення для `figure(table(table.header(..header), ..), caption: ..)`.
+/// Перенос між сторінками з написом «Продовження таблиці N» `style.dstu`
+/// оформлює для будь-якої таблиці-`figure`, тож ця функція -- лише зручність.
+///
+/// - caption (content): Назва таблиці
+/// - columns (int, array): Кількість або ширини колонок
+/// - header (array): Комірки шапки, напр. `([A], [B])`
+/// - label (label): Мітка для посилань, напр. `<my-table>`
+/// - tag (str): Те саме рядком (для сумісності зі старими версіями)
+/// - ..args: Передаються в `table` (комірки, `align`, `stroke`, ...)
+#let dstu-table(caption: none, columns: none, header: none, label: none, tag: none, ..args) = {
   let caption = _required("caption", caption)
   let columns = _required("columns", columns)
   let header = _required("header", header)
-
   if type(header) != array {
     panic("dstu-table: header must be an array, e.g. ([A], [B])")
   }
+  let label = if label != none { label } else if tag != none { std.label(tag) }
 
-  dstu-table-counter.step()
-
-  let named = args.named()
-  let body = args.pos()
-  context {
-    let h = counter(heading).get()
-    let section = if h.len() > 0 { h.at(0) } else { 0 }
-    let n = dstu-table-counter.get().first()
-    let appendix = dstu-table-appendix.get()
-    let num = if appendix == none {
-      numbering("1.1", section, n)
-    } else {
-      upper(ukr-enum.at(appendix - 1)) + "." + str(n)
-    }
-
-    let id = "dstu-table-" + str(section) + "-" + str(n)
-    let start-marker = "start-" + id
-    let end-marker = "end-" + id
-    let cols = _col-count(columns)
-
-    v(double-spacing, weak: true)
-
-    {
-      set block(spacing: dstu-table-caption-gap)
-
-      [#metadata((kind: "dstu-table", number: num)) #if tag != none { label(tag) }]
-
-      block(sticky: true)[
-        #dstu-table-label[Таблиця #num -- #caption]
-      ]
-
-      table(
-        columns: columns,
-        ..named,
-
-        table.header(
-          repeat: true,
-
-          table.cell(
-            colspan: cols,
-            stroke: none,
-            inset: 0pt,
-          )[
-            #metadata(start-marker)
-
-            #context {
-              let starts = query(metadata.where(value: start-marker))
-              let ends = query(metadata.where(value: end-marker))
-
-              if starts.len() > 0 and ends.len() > 0 {
-                let start-page = starts.first().location().page()
-                let end-page = ends.first().location().page()
-                let current-page = here().page()
-
-                if current-page != start-page {
-                  let label = if current-page == end-page {
-                    [Кінець таблиці #num]
-                  } else {
-                    [Продовження таблиці #num]
-                  }
-
-                  pad(top: dstu-table-caption-gap, bottom: dstu-table-caption-gap)[
-                    #dstu-table-label[#label]
-                  ]
-                }
-              }
-            }
-          ],
-
-          ..header,
-        ),
-
-        ..body,
-      )
-    }
-
-    metadata(end-marker)
-
-    v(double-spacing, weak: true)
-  }
+  [#figure(
+      table(columns: columns, ..args.named(), table.header(..header), ..args.pos()),
+      caption: caption,
+    ) #label]
+}
 }
 
 /// Оформлення за ДСТУ 3008:2015: `#show: style.dstu`
@@ -181,15 +170,6 @@
       return it
     }
 
-    // dstu-table refs carry a number already resolved at the table location.
-    if (
-      target.func() == metadata
-        and type(target.value) == dictionary
-        and target.value.at("kind", default: none) == "dstu-table"
-    ) {
-      return link(target.location())[#target.value.at("number")]
-    }
-
     if target.func() != figure and target.func() != math.equation {
       return it
     }
@@ -200,7 +180,7 @@
     // We sample every counter at the target location instead.
     let loc = target.location()
 
-    let appendix = dstu-table-appendix.at(loc)
+    let appendix = appendix-index.at(loc)
 
     let section = if appendix == none {
       str(counter(heading).at(loc).first())
@@ -242,13 +222,17 @@
   show figure.where(kind: raw): set figure.caption(position: top)
   show figure.where(kind: raw): set align(left)
 
+  // Tables: break across pages with «Продовження таблиці N»; the figure wraps
+  // the show rule output in a block, which must be breakable for that
+  show figure.where(kind: table): set block(breakable: true)
+  show figure.where(kind: table): table-figure
+
   // Numbering reset on level 1 headings
   show heading.where(level: 1): it => {
     counter(math.equation).update(0)
     counter(figure.where(kind: raw)).update(0)
     counter(figure.where(kind: image)).update(0)
     counter(figure.where(kind: table)).update(0)
-    dstu-table-counter.update(0)
     it
   }
   set figure(numbering: i => context numbering("1.1", counter(heading).get().at(0), i))
@@ -311,8 +295,7 @@
       counter(figure.where(kind: raw)).update(0)
       counter(figure.where(kind: image)).update(0)
       counter(figure.where(kind: table)).update(0)
-      dstu-table-counter.update(0)
-      dstu-table-appendix.update(counter(heading).get().at(0))
+      appendix-index.update(counter(heading).get().at(0))
 
       set align(center)
       set text(weight: "regular")
