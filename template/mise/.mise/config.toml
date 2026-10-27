@@ -20,11 +20,11 @@ work_output_file = "{{config_root}}/main.pdf"
 # Версія пакунка: гілка (= версія в імпорті `@vendor/nure:<ref>`) і коміт у ній.
 # `mise run update-package-rev` підтягує останній коміт гілки.
 nure_package_repo = "https://github.com/beauloxe/typst-nure-template.git"
-nure_package_ref  = "0.3.0"
-nure_package_rev = "bde3f115b551bb970a24699113d0073e62a355c1"
+nure_package_ref  = "main"
+nure_package_rev = "ef0b8b4254e1d24407fdcff0423c51d539912b0b"
 
 nure_package_name = "vendor/nure"
-nure_package_ver  = "{{vars.nure_package_ref}}"
+nure_package_ver  = "0.3.0"
 
 nure_package_path = "{{vars.package_dir}}/{{vars.nure_package_name}}/{{vars.nure_package_ver}}"
 
