@@ -17,7 +17,8 @@ work_doc_config  = "src/doc.toml"
 work_input_file  = "src/main.typ"
 work_output_file = "{{config_root}}/main.pdf"
 
-# Версія пакунка: гілка (= версія в імпорті `@vendor/nure:<ref>`) і коміт у ній.
+# Пакунок: гілка, коміт у ній і версія (= `version` у typst.toml пакунка і в імпорті
+# `@vendor/nure:<ver>`).
 # `mise run update-package-rev` підтягує останній коміт гілки.
 nure_package_repo = "https://github.com/beauloxe/typst-nure-template.git"
 nure_package_ref  = "main"

@@ -68,6 +68,6 @@ typstyle -l 120 -i src tests template
 
 ## Версії
 
-- Кожна версія -- окрема гілка (`0.3.0`), `main` вказує на останню.
-- Версія задається в `typst.toml`; ті самі цифри мають бути в імпортах шаблонів і в `nure_package_ref` mise-шаблону (це перевіряє CI).
-- Після змін у гілці версії оновіть `nure_package_rev` у [template/mise/.mise/config.toml](../template/mise/.mise/config.toml) на новий коміт (`mise run update-package-rev` у копії шаблону або вручну).
+- Розробка йде в `main`; mise-шаблон бере пакунок з `main` (`nure_package_ref = "main"`).
+- Версія задається в `typst.toml`; ті самі цифри мають бути в імпортах шаблонів і в `nure_package_ver` mise-шаблону (це перевіряє CI).
+- Після змін у `main` оновіть `nure_package_rev` у [template/mise/.mise/config.toml](../template/mise/.mise/config.toml) на новий коміт (`mise run update-package-rev` у копії шаблону або вручну).

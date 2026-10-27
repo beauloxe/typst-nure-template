@@ -15,7 +15,7 @@
 1. Встановіть [mise](https://mise.jdx.dev/getting-started.html) і `git`.
 2. Скопіюйте шаблон роботи:
    ```sh
-   git clone --depth 1 -b 0.3.0 https://github.com/beauloxe/typst-nure-template.git nure-template
+   git clone --depth 1 -b main https://github.com/beauloxe/typst-nure-template.git nure-template
    cp -r nure-template/template/mise lb1
    ```
    На Windows (PowerShell) замість `cp`: `Copy-Item -Recurse nure-template\template\mise lb1`.
@@ -79,12 +79,13 @@ Tinymist шукає пакунок `@vendor/nure` через змінну `TYPST
 Версія задається у `[vars]` файлу `.mise/config.toml`:
 
 ```toml
-nure_package_ref = "0.3.0"       # версія (гілка репозиторію)
-nure_package_rev = "828a058..."  # конкретний коміт цієї версії
+nure_package_ref = "main"        # гілка репозиторію
+nure_package_rev = "828a058..."  # конкретний коміт у ній
+nure_package_ver = "0.3.0"       # версія пакунка (`version` у його typst.toml)
 ```
 
-- **Виправлення в межах версії:** `mise run update-package-rev` -- `nure_package_rev` оновиться до останнього коміту, наступний `compile` завантажить його.
-- **Нова версія:** змініть `nure_package_ref` (напр. на `"0.4.0"`), виконайте `mise run update-package-rev` і змініть версію в імпорті: `#import "@vendor/nure:0.4.0": *`. Перед цим прочитайте [Перехід зі старих версій](migration.md).
+- **Оновлення:** `mise run update-package-rev` -- `nure_package_rev` оновиться до останнього коміту `main`, наступний `compile` завантажить його.
+- **Нова версія:** якщо після оновлення в `main` змінилася `version` у `typst.toml` (напр. на `0.4.0`), змініть `nure_package_ver = "0.4.0"` і версію в імпорті: `#import "@vendor/nure:0.4.0": *`. Перед цим прочитайте [Перехід зі старих версій](migration.md).
 
 Здані роботи краще не оновлювати: вони й так збиратимуться на своїй ревізії.
 
@@ -261,7 +262,7 @@ not_main {{usage.subject}} {{usage.type}} {{usage.number}}
 
 ### Linux і macOS
 ```sh
-git clone -b 0.3.0 https://github.com/beauloxe/typst-nure-template.git ~/.local/share/typst/packages/local/nure/0.3.0
+git clone -b main https://github.com/beauloxe/typst-nure-template.git ~/.local/share/typst/packages/local/nure/0.3.0
 ```
 На macOS тека пакунків -- `~/Library/Application Support/typst/packages/local/nure/0.3.0`.
 
@@ -271,7 +272,7 @@ git clone -b 0.3.0 https://github.com/beauloxe/typst-nure-template.git ~/.local/
 1. Склонуйте репозиторій (наприклад, у «Документи»):
    ```powershell
    cd $HOME\Documents
-   git clone -b 0.3.0 https://github.com/beauloxe/typst-nure-template.git
+   git clone -b main https://github.com/beauloxe/typst-nure-template.git
    ```
 2. Відкрийте PowerShell від імені адміністратора («Пуск» → PowerShell → правою кнопкою → «Запуск від імені адміністратора») і виконайте:
    ```powershell

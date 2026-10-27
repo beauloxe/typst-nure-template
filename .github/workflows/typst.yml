@@ -61,8 +61,10 @@ jobs:
       - name: Check mise template targets this version
         run: |
           version=$(sed -n 's/^version = "\(.*\)"/\1/p' typst.toml)
-          grep -qx "nure_package_ref  = \"$version\"" template/mise/.mise/config.toml \
-            || { echo "::error::template/mise/.mise/config.toml: nure_package_ref is not $version"; exit 1; }
+          grep -qx 'nure_package_ref  = "main"' template/mise/.mise/config.toml \
+            || { echo "::error::template/mise/.mise/config.toml: nure_package_ref is not main"; exit 1; }
+          grep -qx "nure_package_ver  = \"$version\"" template/mise/.mise/config.toml \
+            || { echo "::error::template/mise/.mise/config.toml: nure_package_ver is not $version"; exit 1; }
           for file in template/mise/src/*.typ; do
             if grep -q '@vendor/nure:' "$file" && ! grep -q "@vendor/nure:$version\"" "$file"; then
               echo "::error::$file imports a nure version other than $version"

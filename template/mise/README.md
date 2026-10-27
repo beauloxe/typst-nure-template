@@ -31,12 +31,12 @@ mise run watch
 | `mise run rename` | Скопіювати PDF з назвою для здачі, напр. `ЛБ1_Косач_КУІБ-24-1_СМП.pdf` |
 | `mise run format` | Відформатувати `src/` |
 | `mise run clean` | Видалити PDF |
-| `mise run update-package-rev` | Оновити пакунок до останньої ревізії версії |
+| `mise run update-package-rev` | Оновити пакунок до останнього коміту `main` |
 
 ## Документація
 
-- [Лабораторна чи практична](https://github.com/beauloxe/typst-nure-template/blob/0.3.0/docs/lab.md)
-- [Курсова](https://github.com/beauloxe/typst-nure-template/blob/0.3.0/docs/coursework.md)
-- [Оформлення тексту](https://github.com/beauloxe/typst-nure-template/blob/0.3.0/docs/writing.md): рисунки, таблиці, код, джерела, додатки
-- [Дані роботи](https://github.com/beauloxe/typst-nure-template/blob/0.3.0/docs/data.md): усі поля `doc.toml`, власні дисципліни
-- [Встановлення й налаштування редактора](https://github.com/beauloxe/typst-nure-template/blob/0.3.0/docs/install.md)
+- [Лабораторна чи практична](https://github.com/beauloxe/typst-nure-template/blob/main/docs/lab.md)
+- [Курсова](https://github.com/beauloxe/typst-nure-template/blob/main/docs/coursework.md)
+- [Оформлення тексту](https://github.com/beauloxe/typst-nure-template/blob/main/docs/writing.md): рисунки, таблиці, код, джерела, додатки
+- [Дані роботи](https://github.com/beauloxe/typst-nure-template/blob/main/docs/data.md): усі поля `doc.toml`, власні дисципліни
+- [Встановлення й налаштування редактора](https://github.com/beauloxe/typst-nure-template/blob/main/docs/install.md)

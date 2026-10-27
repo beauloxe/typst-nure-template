@@ -19,7 +19,7 @@
 Потрібні [mise](https://mise.jdx.dev/getting-started.html) і `git`. Typst та все інше mise встановить сам.
 
 ```sh
-git clone --depth 1 -b 0.3.0 https://github.com/beauloxe/typst-nure-template.git nure-template
+git clone --depth 1 -b main https://github.com/beauloxe/typst-nure-template.git nure-template
 cp -r nure-template/template/mise lb1   # Windows (PowerShell): Copy-Item -Recurse nure-template\template\mise lb1
 cd lb1
 mise trust
