@@ -1,0 +1,79 @@
+name: Typst templates
+
+on:
+  push:
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  compile-templates:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Install Typst
+        uses: typst-community/setup-typst@v4
+
+      - name: Compile template fixtures
+        run: |
+          mkdir -p build
+          for test in tests/*.typ; do
+            name=$(basename "$test" .typ)
+            typst compile --root . "$test" "build/$name.pdf"
+          done
+
+      - name: Compare constructor documents with recipes
+        run: |
+          status=0
+          for test in tests/constructor-*.typ; do
+            name=$(basename "$test" .typ)
+            recipe=${name#constructor-}
+            [ -f "tests/$recipe.typ" ] || continue
+            for doc in "$name" "$recipe"; do
+              mkdir -p "build/png/$doc"
+              typst compile --root . --ppi 72 "tests/$doc.typ" "build/png/$doc/p{0p}.png"
+            done
+            if diff <(cd "build/png/$recipe" && sha256sum *.png) <(cd "build/png/$name" && sha256sum *.png); then
+              echo "$name renders identically to $recipe"
+            else
+              echo "::error::$name differs from $recipe"
+              status=1
+            fi
+          done
+          exit $status
+
+      - name: Compile templates against this checkout
+        run: |
+          version=$(sed -n 's/^version = "\(.*\)"/\1/p' typst.toml)
+          packages=$(mktemp -d)
+          for namespace in local vendor; do
+            mkdir -p "$packages/$namespace/nure"
+            ln -s "$PWD" "$packages/$namespace/nure/$version"
+          done
+          for template in template/default/*.typ; do
+            TYPST_PACKAGE_PATH="$packages" typst compile "$template" "build/default-$(basename "$template" .typ).pdf"
+          done
+          TYPST_PACKAGE_PATH="$packages" typst compile template/mise/src/main.typ build/mise.pdf
+
+      - name: Check mise template targets this version
+        run: |
+          version=$(sed -n 's/^version = "\(.*\)"/\1/p' typst.toml)
+          grep -qx "nure_package_ref  = \"$version\"" template/mise/.mise/config.toml \
+            || { echo "::error::template/mise/.mise/config.toml: nure_package_ref is not $version"; exit 1; }
+          for file in template/mise/src/*.typ; do
+            if grep -q '@vendor/nure:' "$file" && ! grep -q "@vendor/nure:$version\"" "$file"; then
+              echo "::error::$file imports a nure version other than $version"
+              exit 1
+            fi
+          done
+
+      - name: Upload rendered fixtures
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: typst-template-fixtures
+          path: build/*.pdf
+          if-no-files-found: ignore

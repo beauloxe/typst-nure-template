@@ -1,0 +1,19 @@
+university = "ХНУРЕ"
+subject = "АКС"
+type = "ЛБ"
+number = 1
+
+[[mentors]]
+name = "Косач Л. П."
+degree = "Доцент кафедри ПЗПІ"
+gender = "f"
+
+[[authors]]
+name = "Шевченко Т. Г."
+edu-program = "КУІБ"
+group = "24-1"
+gender = "m"
+variant = 6
+full-name-gen = "Шевченка Тараса Григоровича"
+course = 2
+semester = 4

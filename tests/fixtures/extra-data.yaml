@@ -1,0 +1,21 @@
+# Data a student keeps in their own project and passes as `work(data: yaml(...))`
+ХНУРЕ:
+  edu-programs:
+    ПЗПІ:
+      code: F2 # override one field, the rest stays built-in
+    ШІ:
+      name-long: Штучний інтелект
+      department-gen: Штучного інтелекту
+      code: 122
+  subjects:
+    НовДис: Нова дисципліна
+
+КПІ:
+  name: Національний технічний університет України «Київський політехнічний інститут імені Ігоря Сікорського»
+  edu-programs:
+    ІПЗ:
+      name-long: Інженерія програмного забезпечення
+      department-gen: Інформатики та програмної інженерії
+      code: 121
+  subjects:
+    ОП: Основи програмування

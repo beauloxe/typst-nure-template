@@ -1,0 +1,83 @@
+[settings]
+quiet = true
+env_shell_expand = true
+lockfile = true
+
+[tools]
+typst = "latest"
+typstyle = "latest"
+tinymist = "latest"
+yq = "latest"
+
+[vars]
+vendor_dir = "{{config_root}}/vendor"
+package_dir = "{{vars.vendor_dir}}/typst-packages"
+
+work_doc_config  = "src/doc.toml"
+work_input_file  = "src/main.typ"
+work_output_file = "{{config_root}}/main.pdf"
+
+# Версія пакунка: гілка (= версія в імпорті `@vendor/nure:<ref>`) і коміт у ній.
+# `mise run update-package-rev` підтягує останній коміт гілки.
+nure_package_repo = "https://github.com/beauloxe/typst-nure-template.git"
+nure_package_ref  = "0.3.0"
+nure_package_rev = "778c3aa2b07c0c8354fb311d27b0a569a284b053"
+
+nure_package_name = "vendor/nure"
+nure_package_ver  = "{{vars.nure_package_ref}}"
+
+nure_package_path = "{{vars.package_dir}}/{{vars.nure_package_name}}/{{vars.nure_package_ver}}"
+
+[env]
+TYPST_PACKAGE_DIR  = "{{vars.package_dir}}"
+TYPST_PACKAGE_PATH = "$TYPST_PACKAGE_DIR"
+
+[tasks.compile]
+description = "Зібрати src/main.typ у main.pdf"
+depends = ["fetch-nure-package"]
+run = "typst compile {{vars.work_input_file}} {{vars.work_output_file}}"
+
+[tasks.watch]
+description = "Перезбирати main.pdf при кожній зміні"
+depends = ["fetch-nure-package"]
+run = "typst watch {{vars.work_input_file}} {{vars.work_output_file}}"
+
+[tasks.format]
+description = "Відформатувати src/ за допомогою typstyle"
+run = "typstyle -l 120 -i {{config_root}}/src"
+
+# Кожен рядок -- окрема команда git, без shell-скрипта, тож працює на будь-якій ОС.
+# `git init` на вже створеному репозиторії нічого не ламає. Задача виконується лише
+# тоді, коли змінився цей файл (наприклад, nure_package_rev), тож `compile` і
+# `watch` не ходять у мережу щоразу.
+[tasks.fetch-nure-package]
+description = "Завантажити пакунок nure потрібної ревізії у vendor/"
+sources = [".mise/config.toml"]
+outputs = { auto = true }
+run = [
+  "git init -q {{vars.nure_package_path}}",
+  "git -C {{vars.nure_package_path}} fetch -q --depth 1 {{vars.nure_package_repo}} {{vars.nure_package_rev}}",
+  "git -C {{vars.nure_package_path}} checkout -q --detach FETCH_HEAD",
+]
+
+# Задачі нижче потребують POSIX-shell (на Windows -- Git Bash).
+[tasks.clean]
+description = "Видалити зібрані PDF"
+run = "rm -vf *.pdf"
+
+[tasks.update-package-rev]
+description = "Оновити nure_package_rev до останнього коміту гілки nure_package_ref"
+run = "mise config set vars.nure_package_rev $(git ls-remote {{vars.nure_package_repo}} refs/heads/{{vars.nure_package_ref}} | cut -f1)"
+
+[tasks.rename]
+description = "Скопіювати main.pdf з назвою на кшталт ЛБ1_Прізвище_КУІБ-24-1_АКС.pdf"
+depends = ["compile"]
+run = """
+  #!/usr/bin/env bash
+  # Назва береться з doc.toml: ПЗ1_Прізвище_ПЗПІ-23-2_ПарП.pdf
+  # Очікує authors[0].name у форматі "Прізвище І. Б."
+
+  final_name=$(yq '.type + (.number | tostring) + "_" + (.authors[0].name | split(" "))[0] + "_" + (.authors[0].edu-program + "-" + .authors[0].group) + "_" + .subject + ".pdf"' "{{vars.work_doc_config}}");
+
+  cp -v "{{vars.work_output_file}}" "$final_name"
+"""

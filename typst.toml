@@ -1,0 +1,12 @@
+[package]
+name = "nure"
+version = "0.3.0"
+entrypoint = "src/lib.typ"
+compiler = "0.15.0"
+authors = ["beauloxe"]
+license = "GPL-3.0"
+description = "Typst NURE package"
+
+[template]
+path = "template/default"
+entrypoint = "lab.typ"

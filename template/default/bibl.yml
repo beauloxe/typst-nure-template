@@ -1,0 +1,79 @@
+go:
+  type: Web
+  title: The Go Programming Language
+  author: The Go Programming Language
+  url:
+    value: https://go.dev/
+    date: 2024-12-10
+
+htmx:
+  type: Web
+  title: Htmx - high power tools for html
+  author: Htmx - high power tools for html
+  url:
+    value: https://htmx.org/
+    date: 2024-12-10
+
+mysql:
+  type: Book
+  title: MySQL Language Reference
+  author: Ab M.
+  publisher: MySQL Press
+  date: 2004
+  page-total: 600
+
+neovim:
+  type: Web
+  title: About neovim
+  author: Neovim
+  url:
+    value: https://neovim.io/charter/
+    date: 2024-12-10
+
+echo:
+  type: Web
+  title: High performance, extensible, minimalist Go web framework | Echo
+  author: High performance, extensible, minimalist Go web framework | Echo
+  url:
+    value: https://echo.labstack.com/
+    date: 2024-12-10
+
+sqlx:
+  type: Web
+  title: Illustrated Guide to SQLX
+  author: GitHub Pages
+  url:
+    value: http://jmoiron.github.io/sqlx/
+    date: 2024-12-10
+
+human:
+  type: Web
+  title: Про нас | HUMAN
+  author: HUMAN
+  url:
+    value: https://human.ua/
+    date: 2024-12-11
+
+docker:
+  type: Web
+  title: "Docker: accelerated container application development"
+  author: Docker
+  url:
+    value: https://www.docker.com/
+    date: 2024-12-15
+
+docker_compose:
+  type: Web
+  title: Docker compose
+  author: Docker Documentation
+  url:
+    value: https://docs.docker.com/compose/
+    date: 2024-12-15
+
+hateoas:
+  type: Web
+  title: HATEOAS and Why It's Needed in RESTful API?
+  author: GeeksforGeeks
+  url:
+    value: https://www.geeksforgeeks.org/hateoas-and-why-its-needed-in-restful-api/
+    date: 2024-12-15

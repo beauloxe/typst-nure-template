@@ -1,0 +1,35 @@
+university = "ХНУРЕ"
+subject = "СМП"
+type = "ЛБ"
+number = 1
+title = "Тестова робота для перевірки шаблону"
+
+[[authors]]
+name = "Косач Л. П."
+edu-program = "КУІБ"
+group = "23-2"
+gender = "f"
+variant = 8
+full-name-gen = "Косач Лариси Петрівни"
+course = 2
+semester = 4
+
+[[authors]]
+name = "Шевченко Т. Г."
+edu-program = "ПЗПІ"
+group = "ПЗПІ-22-8"
+gender = "m"
+variant = 9
+full-name-gen = "Шевченка Тараса Григоровича"
+course = 2
+semester = 4
+
+[[mentors]]
+name = "Сковорода Г. С."
+degree = "Доцент кафедри ПЗПІ"
+gender = "m"
+
+[[mentors]]
+name = "Франко І. Я."
+degree = "Асистент кафедри ІКІ"
+gender = "m"
