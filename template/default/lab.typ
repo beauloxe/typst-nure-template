@@ -48,8 +48,10 @@
 === Підготовка
 #lorem(150)
 
-// Рисунки: назву файлу обгортаємо в `path()`, бо рядок шукався б у пакунку
-// #dstu-figure(path("figures/scheme.png"), [Схема дослідження], label: <scheme>) // посилання @scheme
+// Рисунки (`fig` = `dstu-figure`): назву файлу обгортаємо в `path()`, бо рядок шукався б у пакунку
+// #fig(path("figures/scheme.png"), [Схема дослідження], label: <scheme>) // посилання @scheme
+// Таблиці (`tab` = `dstu-table`)
+// #tab(caption: [Результати], columns: 2, header: ([Дослід], [Час, с]), label: <results>, [1], [0.42])
 
 === Виконання дослідження
 #lorem(300)

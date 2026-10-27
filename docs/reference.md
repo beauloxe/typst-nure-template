@@ -2,6 +2,16 @@
 
 Усе, що експортує `#import "@vendor/nure:0.3.0": *` (або `@local/...`). Підказки з тими самими описами показує Tinymist у редакторі.
 
+## Короткі назви
+
+| Коротко | Повна назва | Опис |
+| --- | --- | --- |
+| `fig(file, caption, source, label: none, ..args)` | [`dstu-figure`](#dstu-figurefile-caption-source-label-none-args) | Рисунок |
+| `tab(caption:, columns:, header:, label: none, ..args)` | [`dstu-table`](#dstu-tablecaption-columns-header-label-none-tag-none-args) | Таблиця |
+| `bib(source, style: "3008", ..)` | [`dstu-bibliography`](#dstu-bibliographysource-style-3008-title-перелік-джерел-посилання-full-true) | Перелік джерел |
+
+Короткі й повні назви -- одні й ті самі функції: аргументи й результат однакові. Див. [Короткі назви](writing.md#короткі-назви).
+
 ## Дані
 
 ### `work(...) -> dictionary`

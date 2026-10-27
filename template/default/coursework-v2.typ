@@ -126,8 +126,8 @@
 = Тестування
 #lorem(300)
 
-// ПРИМІТКА: назви файлів обгортаємо в `path()`, бо рядок шукався б у теці пакунка
-#dstu-bibliography(path("bibl.yml"), style: "8302")
+// ПРИМІТКА: назви файлів обгортаємо в `path()`, бо рядок шукався б у теці пакунка (`bib` = `dstu-bibliography`)
+#bib(path("bibl.yml"), style: "8302")
 
 #show: style.appendices
 

@@ -18,21 +18,20 @@
 
 /// Корисні фрагменти
 
-/// Рисунок: назву файлу обгортаємо в `path()`
-// #dstu-figure(path("figures/clojure-logo.png"), [Логотип Clojure], "clojure.org", label: <clojure-logo>)
+/// Рисунок (`fig` = `dstu-figure`): назву файлу обгортаємо в `path()`
+// #fig(path("figures/clojure-logo.png"), [Логотип Clojure], "clojure.org", label: <clojure-logo>)
 
-/// Таблиця з .csv
-// #figure(
+/// Таблиця з .csv (`tab` = `dstu-table`)
+// #tab(
 //   caption: [],
-//   table(
-//     columns: 4,
-//     table.header([], [], [], []),
-//     ..csv("assets/table.csv").flatten(),
-//   ),
+//   columns: 4,
+//   header: ([], [], [], []),
+//   label: <table>,
+//   ..csv("assets/table.csv").flatten(),
 // )
 
-/// Перелік джерел
-// #dstu-bibliography(path("assets/bibl.yml"))
+/// Перелік джерел (`bib` = `dstu-bibliography`)
+// #bib(path("assets/bibl.yml"))
 
 /// Додатки
 // #style.appendices(include "chapters/appendices.typ")
