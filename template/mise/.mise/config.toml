@@ -21,7 +21,7 @@ work_output_file = "{{config_root}}/main.pdf"
 # `mise run update-package-rev` підтягує останній коміт гілки.
 nure_package_repo = "https://github.com/beauloxe/typst-nure-template.git"
 nure_package_ref  = "0.3.0"
-nure_package_rev = "778c3aa2b07c0c8354fb311d27b0a569a284b053"
+nure_package_rev = "828a05865e1b38cdc806a5d938cc374620757f95"
 
 nure_package_name = "vendor/nure"
 nure_package_ver  = "{{vars.nure_package_ref}}"
