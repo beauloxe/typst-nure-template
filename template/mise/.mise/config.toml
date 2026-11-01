@@ -7,7 +7,6 @@ lockfile = true
 typst = "latest"
 typstyle = "latest"
 tinymist = "latest"
-yq = "latest"
 
 [vars]
 vendor_dir = "{{config_root}}/vendor"
@@ -75,10 +74,17 @@ description = "Скопіювати main.pdf з назвою на кшталт �
 depends = ["compile"]
 run = """
   #!/usr/bin/env bash
-  # Назва береться з `w` у main.typ (тобто з doc.toml і полів work(...)): ПЗ1_Прізвище_ПЗПІ-23-2_ПарП.pdf
+  # Назва складається в Typst з `w` у main.typ: ПЗ1_Прізвище_ПЗПІ-23-2_ПарП.pdf
   # Очікує authors[0].name у форматі "Прізвище І. Б."
-
-  final_name=$(typst eval --root "{{vars.work_src_dir}}" '{ import "/main.typ": w; w }' | yq -p json '.type + (.number | tostring) + "_" + (.authors[0].name | split(" "))[0] + "_" + (.authors[0].edu-program + "-" + .authors[0].group) + "_" + .subject + ".pdf"');
+  final_name=$(typst eval --root "{{vars.work_src_dir}}" '{
+    import "/main.typ": w
+    let a = w.authors.first()
+    let number = if w.number != none { str(w.number) } else { "" }
+    w.type + number + "_" + a.name.split(" ").first() + "_" + a.edu-program + "-" + str(a.group) + "_" + w.subject + ".pdf"
+  }')
+  # typst eval виводить рядок JSON у лапках
+  final_name=${final_name#'"'}
+  final_name=${final_name%'"'}
 
   cp -v "{{vars.work_output_file}}" "$final_name"
 """
