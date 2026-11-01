@@ -137,7 +137,7 @@
 /// - university (str): Код університету, див. src/config/universities.yaml
 /// - edu-program (str): Код освітньої програми, за замовчуванням -- першого автора
 /// - subject (str): Код дисципліни, див. src/config/universities.yaml
-/// - type (str): Тип роботи (ЛБ, ПЗ, КР, РФ, ІДЗ)
+/// - type (str): Тип роботи (ЛБ, ПЗ, КР, ІДЗ)
 /// - number (int): Номер роботи
 /// - title (str): Тема роботи
 /// - authors (array): Автори
