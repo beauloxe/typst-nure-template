@@ -28,7 +28,7 @@
    mise install    # встановити Typst та інші інструменти
    mise run watch  # завантажити пакунок і перезбирати main.pdf при кожному збереженні
    ```
-4. Впишіть свої дані в `src/doc.toml` (див. [Дані роботи](data.md)) і пишіть текст у `src/main.typ` (див. [Лабораторна чи практична](lab.md)).
+4. Впишіть свої дані в `src/doc.toml` (див. [Дані роботи](data.md)), тип, номер і тему -- на початку `src/main.typ`, і пишіть текст (див. [Лабораторна чи практична](lab.md)).
 
 ### Тека роботи
 ```
@@ -39,8 +39,8 @@ lb1/
 ├── vendor/           -- пакунок nure (завантажується сам, у git не потрапляє)
 ├── main.pdf          -- результат
 └── src/
-    ├── doc.toml      -- дані роботи
-    ├── main.typ      -- текст роботи
+    ├── doc.toml      -- спільні дані: дисципліна, автори, викладачі
+    ├── main.typ      -- тип, номер, тема й текст роботи
     ├── utils.typ     -- ваші допоміжні функції
     ├── data.yaml     -- (необов'язково) власні дисципліни й університети
     ├── chapters/     -- розділи, якщо робота велика
@@ -90,7 +90,7 @@ nure_package_ver = "0.3.0"       # версія пакунка (`version` у й�
 Здані роботи краще не оновлювати: вони й так збиратимуться на своїй ревізії.
 
 ### Організація семестру
-Підхід [unexplrd](https://gitea.linerds.us/unexplrd): одна тека на семестр, шаблон роботи і nushell-задача, яка створює нову роботу й заповнює `doc.toml`.
+Підхід [unexplrd](https://gitea.linerds.us/unexplrd): одна тека на семестр, шаблон роботи і nushell-задача, яка створює нову роботу, заповнює `doc.toml` і вписує тип і номер у `main.typ`.
 
 ```
 /home/user/Documents/nure/
@@ -189,7 +189,8 @@ def not_main [subject: string, shortcode: string, number?: int] {
 
     # TODO?: replace with git clone
     cp -r ($config_dir)/template $temp_dir
-    generate-doc-toml $shortcode_lower $subject_lower $temp_dir $number
+    generate-doc-toml $subject_lower $temp_dir
+    set-work-type $shortcode_lower $temp_dir $number
     check-mkdir $out_dir
     if ($final_dir | path exists) {
         error make -u {msg: $"Directory ($final_dir) already exists"}
@@ -230,18 +231,29 @@ def validate-input [subject: string, shortcode: string, number?: int] {
     }
 }
 
-def generate-doc-toml [shortcode: string, subject: string, target_dir: string, number?: int] {
+def generate-doc-toml [subject: string, target_dir: string] {
     let defaults = (open $"($config_dir)/defaults.yaml")
     let subjects = (open $"($config_dir)/subjects.yaml")
 
     let subject_data = ($subjects | get $subject)
-    let work_type = ($defaults | get work_types | try { get $shortcode } catch { $shortcode })
 
     {
         university: ($defaults | get university)
-        subject: ($subject_data | get name), type: $work_type, number: $number
+        subject: ($subject_data | get name)
         mentors: ($subject_data | get mentors), authors: [($defaults | get default_author)]
     } | compact --empty | to toml | save $"($target_dir)/src/doc.toml" --force
+}
+
+# Тип і номер -- у work(...) в main.typ
+def set-work-type [shortcode: string, target_dir: string, number?: int] {
+    let defaults = (open $"($config_dir)/defaults.yaml")
+    let work_type = ($defaults | get work_types | try { get $shortcode } catch { $shortcode })
+    let main = $"($target_dir)/src/main.typ"
+
+    open --raw $main
+    | str replace --regex 'type: "[^"]*"' $'type: "($work_type)"'
+    | str replace --regex 'number: \d+' $"number: ($number | default 'none')"
+    | save $main --force
 }
 
 not_main {{usage.subject}} {{usage.type}} {{usage.number}}
@@ -252,7 +264,7 @@ not_main {{usage.subject}} {{usage.type}} {{usage.number}}
 
 `mise run work smp lb 1` робить дві речі:
 - копіює шаблон у `works/smp/lb1`;
-- заповнює `doc.toml` даними з `defaults.yaml` і викладачами з `subjects.yaml`.
+- заповнює `doc.toml` даними з `defaults.yaml` і викладачами з `subjects.yaml`, а тип і номер роботи вписує у `work(...)` в `main.typ`.
 
 Дисципліни, яких немає в пакунку, кладіть у `.config/template/src/data.yaml` -- тоді кожна нова робота отримає копію.
 

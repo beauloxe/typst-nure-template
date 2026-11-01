@@ -1,7 +1,5 @@
 university = "ХНУРЕ"
 subject = "АКС"
-type = "ЛБ"
-number = 1
 
 [[mentors]]
 name = "Косач Л. П."

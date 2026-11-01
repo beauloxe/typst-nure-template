@@ -3,9 +3,14 @@
 
 #import style: spacing
 
-// Дані роботи з doc.toml; власні дисципліни/університети додаються через
-// `data: yaml("data.yaml")`
-#let w = work(..toml("doc.toml"), title: "Дослідження роботи мікроконтролера 8051") // title: none, якщо теми немає
+// Спільні дані дисципліни -- з doc.toml, тип, номер і тема -- свої для кожної роботи.
+// Власні дисципліни/університети додаються через `data: yaml("data.yaml")`
+#let w = work(
+  ..toml("doc.toml"),
+  type: "ЛБ", // ЛБ, ПЗ, КР, РФ, ІДЗ
+  number: 1,
+  title: "Дослідження роботи мікроконтролера 8051", // title: none, якщо теми немає
+)
 
 #set document(..w.document)
 #show: style.dstu.with(skip: 1)

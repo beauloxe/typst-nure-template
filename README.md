@@ -27,7 +27,7 @@ mise install
 mise run watch
 ```
 
-Готово: `main.pdf` перезбирається при кожному збереженні. Відкрийте `src/doc.toml`, впишіть свої дані й пишіть текст у `src/main.typ`.
+Готово: `main.pdf` перезбирається при кожному збереженні. Відкрийте `src/doc.toml`, впишіть свої дані, а в `src/main.typ` -- тип, номер і тему роботи, і пишіть текст.
 
 Без mise пакунок можна встановити як звичайний локальний пакунок Typst -- див. [Встановлення](docs/install.md).
 
@@ -37,8 +37,6 @@ mise run watch
 
 ```toml
 subject = "СМП"          # скорочення дисципліни, повна назва підставиться сама
-type = "ЛБ"              # ЛБ, ПЗ, КР, РФ, ІДЗ
-number = 1
 
 [[authors]]
 name = "Косач Л. П."
@@ -53,13 +51,18 @@ degree = "Доцент кафедри ПІ"
 gender = "m"
 ```
 
-`src/main.typ` -- сама робота:
+`src/main.typ` -- сама робота; тип, номер і тема в кожної роботи свої, тому вони тут:
 
 ```typst
 #import "@vendor/nure:0.3.0": *
 #import style: spacing
 
-#let w = work(..toml("doc.toml"), title: "Потік керування в Bash")
+#let w = work(
+  ..toml("doc.toml"),
+  type: "ЛБ", // ЛБ, ПЗ, КР, РФ, ІДЗ
+  number: 1,
+  title: "Потік керування в Bash",
+)
 
 #set document(..w.document)
 #show: style.dstu.with(skip: 1)

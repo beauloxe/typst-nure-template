@@ -3,7 +3,8 @@
 #import style: spacing
 
 // 1. Описуємо роботу один раз; усі блоки нижче беруть дані звідси.
-//    (або тримаємо дані у файлі: `#let w = work(..toml("doc.toml"))`)
+//    (або тримаємо спільні для дисципліни дані у файлі:
+//    `#let w = work(..toml("doc.toml"), type: "ЛБ", number: 2, title: "...")`)
 #let w = work(
   university: "ХНУРЕ",
   subject: "СМП",
