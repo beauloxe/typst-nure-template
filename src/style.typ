@@ -238,6 +238,14 @@
   set figure(numbering: i => context numbering("1.1", counter(heading).get().at(0), i))
   set math.equation(numbering: i => context numbering("(1.1)", counter(heading).get().at(0), i))
 
+  // Decimal comma in formulas: $9.8$ -> 9,8. In math every number is a separate
+  // text atom, so the anchored regex rewrites only whole numbers and leaves the
+  // equation number «(1.1)» (one text with parentheses) untouched.
+  show math.equation: it => {
+    show regex("^\d+\.\d+$"): m => m.text.replace(".", ",")
+    it
+  }
+
   // Headings
   set heading(numbering: "1.1")
   show heading: it => {
