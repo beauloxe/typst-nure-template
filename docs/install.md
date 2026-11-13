@@ -31,6 +31,7 @@
 4. Впишіть свої дані в `src/doc.toml` (див. [Дані роботи](data.md)), тип, номер і тему -- на початку `src/main.typ`, і пишіть текст (див. [Лабораторна чи практична](lab.md)).
 
 ### Тека роботи
+
 ```
 lb1/
 ├── .mise/
@@ -94,12 +95,15 @@ nure_package_ver = "0.3.0"       # версія пакунка (`version` у й�
 Пакунок встановлюється один раз у теку локальних пакунків Typst і доступний у всіх роботах як `@local/nure:0.3.0`. Typst при цьому ставите самі ([інструкція](https://github.com/typst/typst#installation)).
 
 ### Linux і macOS
+
 ```sh
 git clone -b main https://github.com/beauloxe/typst-nure-template.git ~/.local/share/typst/packages/local/nure/0.3.0
 ```
+
 На macOS тека пакунків -- `~/Library/Application Support/typst/packages/local/nure/0.3.0`.
 
 ### Windows
+
 Найзручніше склонувати репозиторій у звичне місце і поставити на нього символьне посилання з теки пакунків -- тоді для оновлення достатньо `git pull`.
 
 1. Склонуйте репозиторій (наприклад, у «Документи»):
@@ -116,14 +120,17 @@ git clone -b main https://github.com/beauloxe/typst-nure-template.git ~/.local/s
 Версія в назві теки (`0.3.0`) має збігатися з `version` у `typst.toml` пакунка, інакше Typst його не завантажить.
 
 ### Нова робота
+
 ```sh
 typst init @local/nure:0.3.0 lb1
 ```
+
 Створиться тека `lb1` з прикладами: `lab.typ` (лабораторна), `coursework.typ` і `coursework-v2.typ` (курсові) та `bibl.yml` (джерела). Зайве видаліть. В імпорті використовуйте `@local/nure:0.3.0` -- у документації приклади написано для mise, де це `@vendor/nure:0.3.0`.
 
 Зібрати PDF: `typst watch lab.typ`. У VS Code з Tinymist нічого додатково налаштовувати не треба.
 
 ## Окремими файлами
+
 Скопіюйте теку `src/` репозиторію в проєкт (можна перейменувати, наприклад, на `lib/`) та імпортуйте її напряму:
 
 ```typst
