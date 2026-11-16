@@ -143,6 +143,9 @@
     number-align: top + right,
     margin: (top: 20mm, right: 10mm, bottom: 20mm, left: 25mm),
     numbering: (i, ..) => if i > skip { numbering("1", i + offset) },
+    // Виноски нумерують у межах кожної сторінки (7.9.2): фон кладеться на
+    // кожну сторінку раніше за її вміст, тож лічильник скидається до першої виноски
+    background: counter(footnote).update(0),
   )
 
   // Text and paragraph
@@ -161,6 +164,18 @@
     it
   }
   set list(indent: indent-size + 0.1cm, body-indent: 0.5cm, marker: [--])
+
+  // Footnotes (7.9.2, 7.9.5, 7.9.6): «1)» над рядком; текст з абзацного
+  // відступу, кеглем 12 через один інтервал; лінія 35 мм від лівого берега
+  set footnote(numbering: "1)")
+  set footnote.entry(separator: line(length: 35mm, stroke: 0.5pt), indent: 0pt)
+  show footnote.entry: set text(size: 12pt)
+  show footnote.entry: set par(leading: 0.65em, spacing: 0.65em, first-line-indent: (
+    amount: indent-size,
+    all: true,
+  ))
+  // запис виноски -- не абзац, тож без обгортки відступ першого рядка не діє
+  show footnote.entry: it => par(it)
 
   // Figures
   show ref: it => {
@@ -237,6 +252,18 @@
   }
   set figure(numbering: i => context numbering("1.1", counter(heading).get().at(0), i))
   set math.equation(numbering: i => context numbering("(1.1)", counter(heading).get().at(0), i))
+
+  // Нумерують лише ті формули, на які є посилання (7.10.2). Формула без
+  // посилання виводиться без номера, а лічильник повертається назад, тож
+  // номери решти йдуть без пропусків. Явне `numbering: none` не чіпається.
+  show math.equation.where(block: true): it => {
+    if it.numbering == none { return it }
+    context {
+      if it.has("label") and query(ref.where(target: it.label)).len() > 0 { return it }
+      counter(math.equation).update(n => n - 1)
+      math.equation(it.body, block: true, numbering: none)
+    }
+  }
 
   // Decimal comma in formulas: $9.8$ -> 9,8. In math every number is a separate
   // text atom, so the anchored regex rewrites only whole numbers and leaves the
