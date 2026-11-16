@@ -10,6 +10,8 @@
 ///
 /// Команда друкує зауваження і завершується з кодом 1, якщо вони є.
 
+#import "./style.typ": table-seq
+
 /// Правила: код -> пункт ДСТУ 3008:2015 (`clause`) і суть вимоги (`desc`).
 /// Перевіряється лише те, що стандарт вимагає прямо; лістингів він не описує,
 /// тож їх лінтер не чіпає.
@@ -31,7 +33,10 @@
     desc: "Рисунок і таблицю подають після тексту, де їх згадано вперше, або на наступній сторінці",
   ),
   "caption-case": (clause: "7.5.9, 7.6.8", desc: "Назву рисунка й таблиці друкують з великої літери"),
-  "table-no-header": (clause: "7.6.1, 7.6.9", desc: "Таблиця має головку, яку повторюють у кожній її частині"),
+  "table-no-header": (
+    clause: "7.6.9",
+    desc: "У кожній частині таблиці, перенесеної на наступну сторінку, повторюють її головку",
+  ),
   "table-header-case": (clause: "7.6.10", desc: "Заголовки колонок таблиці починають з великої літери"),
   "table-header-period": (clause: "7.6.11", desc: "У кінці заголовків і підзаголовків таблиць крапки не ставлять"),
   "list-case": (clause: "7.7.4", desc: "Текст кожної позиції переліку починають з малої літери"),
@@ -123,6 +128,20 @@
   if c.has("body") { return _find-table(c.body) }
   if c.has("child") { return _find-table(c.child) }
   none
+}
+
+/// Чи займає таблиця-фігура більше однієї сторінки. `style.dstu` (`table-figure`)
+/// ставить перед таблицею й після неї маркери `dstu-table-start-N` і
+/// `dstu-table-end-N`, де N -- значення `table-seq` після кроку в цій фігурі.
+/// Плаваючу фігуру шаблон не розриває, а без маркерів (документ без
+/// `style.dstu`) перенос не визначити -- в обох випадках `false`.
+#let _spans-pages(f) = {
+  if f.placement != none { return false }
+  let id = str(table-seq.at(f.location()).first() + 1)
+  let start = query(metadata.where(value: "dstu-table-start-" + id))
+  let end = query(metadata.where(value: "dstu-table-end-" + id))
+  if start.len() == 0 or end.len() == 0 { return false }
+  start.first().location().page() != end.first().location().page()
 }
 
 /// Зауваження до документа: масив словників `(rule, clause, page, msg)`, упорядкований
@@ -244,7 +263,15 @@
     if tbl == none { continue }
     let header = tbl.children.find(c => c.func() == table.header)
     if header == none {
-      diags += add("table-no-header", loc, name + " без головки (table.header)")
+      // Таблиця без головки на одній сторінці стандарту не суперечить
+      // (буває лише боковик); головку вимагає тільки перенос (7.6.9)
+      if _spans-pages(f) {
+        diags += add(
+          "table-no-header",
+          loc,
+          name + " переходить на наступну сторінку без головки (table.header), тож вона не повторюється",
+        )
+      }
       continue
     }
     // Підзаголовки (другий рядок головки) можуть починатися з малої літери,
