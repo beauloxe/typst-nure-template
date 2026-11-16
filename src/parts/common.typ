@@ -75,6 +75,10 @@
   counters.join(", ")
 }
 
+/// Невидима позначка з кількістю ключових слів реферату -- її читає лінтер
+/// (`lint.typ`, правило `keywords-count`)
+#let keywords-count(keywords) = [#metadata(keywords.len())<nure-keywords>]
+
 /// Сортує ключові слова реферату: спершу кирилиця, далі за абеткою.
 /// - key (function): Повертає рядок, за яким сортується елемент
 #let sort-keywords(keywords, key: it => it) = keywords.sorted(by: (a, b) => {

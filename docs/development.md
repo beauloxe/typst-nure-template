@@ -7,6 +7,7 @@ src/
 ├── lib.typ               -- точка входу: що експортує пакунок
 ├── work.typ              -- work(): нормалізація даних роботи
 ├── recipes.typ           -- pz-lb, coursework, coursework-v2 як композиції блоків
+├── lint.typ              -- лінтер за ДСТУ 3008:2015 (docs/lint.md)
 ├── style.typ             -- style.dstu (зокрема оформлення таблиць), style.appendices, dstu-table
 ├── utils.typ             -- utils.*: dstu-figure, nheading, uline, ...
 ├── helpers.typ           -- дрібні чисті функції: gender-form, group-form, deep-merge, ...

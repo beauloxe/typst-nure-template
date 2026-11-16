@@ -61,6 +61,11 @@ run = [
 ]
 
 # Задачі нижче потребують POSIX-shell (на Windows -- Git Bash).
+[tasks.lint]
+description = "Перевірити роботу за ДСТУ 3008:2015"
+depends = ["fetch-nure-package"]
+run = "typst eval '{ import \"@{{vars.nure_package_name}}:{{vars.nure_package_ver}}\": lint; lint.check() }' --in {{vars.work_input_file}}"
+
 [tasks.clean]
 description = "Видалити зібрані PDF"
 run = "rm -vf *.pdf"

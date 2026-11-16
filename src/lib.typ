@@ -3,6 +3,7 @@
 
 #import "./style.typ"
 #import "./utils.typ"
+#import "./lint.typ"
 
 #let dstu-table = style.dstu-table
 #let dstu-figure = utils.dstu-figure

@@ -1,6 +1,6 @@
 #import "../helpers.typ": *
 #import "../utils.typ": bold, hfill, uline
-#import "common.typ": contents as base-contents, doc-stats, sort-keywords
+#import "common.typ": contents as base-contents, doc-stats, keywords-count, sort-keywords
 
 // Parts of a coursework explanatory note (NURE). Every part takes the
 // dictionary returned by `work` and is a whole page (or several).
@@ -222,7 +222,7 @@
 
   \
 
-  #sort-keywords(keywords.map(upper)).join(", ")
+  #sort-keywords(keywords.map(upper)).join(", ")#keywords-count(keywords)
 
   \
   #body
