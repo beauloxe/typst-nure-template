@@ -8,7 +8,7 @@
 // the n-th table figure of the document spans pages start..end
 #let spans(n) = {
   let page-of(key) = query(metadata.where(value: key + str(n))).first().location().page()
-  (page-of("dstu-table-start-"), page-of("dstu-table-end-"))
+  (page-of("dstu-figure-start-"), page-of("dstu-figure-end-"))
 }
 
 #show: style.dstu
@@ -112,7 +112,7 @@
 #context {
   // floating figures are left as they are, without markers
   assert.eq(query(figure.where(kind: table)).len(), 14)
-  assert.eq(query(metadata).filter(m => type(m.value) == str and m.value.starts-with("dstu-table-start-")).len(), 13)
+  assert.eq(query(metadata).filter(m => type(m.value) == str and m.value.starts-with("dstu-figure-start-")).len(), 13)
 }
 #context [Підсумки: #doc-stats()]
 

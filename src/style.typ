@@ -11,41 +11,42 @@
 /// Номер поточного додатка (`none` поза додатками), для нумерації в посиланнях
 #let appendix-index = state("appendix-index", none)
 
-/// Відступ між підписом таблиці й таблицею та під написом «Продовження таблиці»
+/// Відступ між підписом таблиці (лістингу) й нею та під написом «Продовження таблиці»
 #let table-caption-gap = 0.65em
 
-// Наскрізний номер таблиці в документі -- для унікальних ключів маркерів
-// початку й кінця таблиці (позиція фігури як ключ працює, але в рази повільніше).
-#let table-seq = counter("dstu-table-seq")
+// Наскрізний номер таблиці чи лістингу в документі -- для унікальних ключів
+// маркерів початку й кінця фігури (позиція фігури як ключ працює, але в рази повільніше).
+#let figure-seq = counter("dstu-figure-seq")
 
-// Напис над продовженням таблиці на новій сторінці; на першій її сторінці -- нічого.
-#let continuation-label(num, start-key, end-key) = context {
+// Напис над продовженням фігури на новій сторінці; на першій її сторінці -- нічого.
+#let continuation-label(noun, num, start-key, end-key) = context {
   let start = query(metadata.where(value: start-key)).first().location().page()
   if here().page() == start { return }
   let end = query(metadata.where(value: end-key)).first().location().page()
   set par(first-line-indent: 0pt)
   block(inset: (bottom: table-caption-gap))[
-    #if here().page() == end [Кінець] else [Продовження] таблиці#if num != none [ #num]
+    #if here().page() == end [Кінець] else [Продовження] #noun#if num != none [ #num]
   ]
 }
 
-// Оформлення таблиці-`figure` за ДСТУ: підпис ліворуч над таблицею, перенос
-// між сторінками з написом «Продовження таблиці N». Таблиця користувача не
-// перебудовується, а обгортається в сітку з однією колонкою: шапка сітки
-// повторюється на кожній сторінці й несе напис, а єдина комірка -- сама
-// таблиця, як є. Тому номери рядків, явні аргументи, set- і show-правила
-// користувача не зачіпаються.
-#let table-figure(fig) = {
+// Оформлення таблиці- чи лістингу-`figure` за ДСТУ: підпис ліворуч над
+// фігурою, перенос між сторінками з написом «Продовження таблиці N»
+// («Продовження лістингу N»). Вміст користувача не перебудовується, а
+// обгортається в сітку з однією колонкою: шапка сітки повторюється на кожній
+// сторінці й несе напис, а єдина комірка -- сама таблиця чи код, як є. Тому
+// номери рядків, явні аргументи, set- і show-правила користувача не зачіпаються.
+#let breakable-figure(fig) = {
   // плаваючу фігуру однаково не можна розірвати -- лишаємо як є
   if fig.placement != none { return fig }
 
-  // номер цієї таблиці («1.2», «А.1»); обчислюється там, де стоїть напис
+  let noun = if fig.kind == raw [лістингу] else [таблиці]
+  // номер цієї фігури («1.2», «А.1»); обчислюється там, де стоїть напис
   let num = if fig.numbering != none { fig.counter.display(fig.numbering) }
 
-  table-seq.step()
+  figure-seq.step()
   context {
-    let id = str(table-seq.get().first())
-    let (start-key, end-key) = ("dstu-table-start-" + id, "dstu-table-end-" + id)
+    let id = str(figure-seq.get().first())
+    let (start-key, end-key) = ("dstu-figure-start-" + id, "dstu-figure-end-" + id)
 
     // інтервали, які для інших фігур додає show-правило фігури в `dstu`
     // (до цього виводу воно вже не застосовується)
@@ -60,7 +61,7 @@
     }
 
     metadata(start-key)
-    // Колонка на всю ширину тексту, щоб напис не переносився; таблиця в ній --
+    // Колонка на всю ширину тексту, щоб напис не переносився; вміст у ній --
     // від лівого краю. Решта значень явні, щоб `set grid(...)` користувача не
     // зачепив обгортку.
     grid(
@@ -72,12 +73,12 @@
       gutter: 0pt,
       grid.header(
         repeat: true,
-        continuation-label(num, start-key, end-key),
+        continuation-label(noun, num, start-key, end-key),
       ),
       {
-        // У звичайному figure вміст комірок центрується, бо фігура вирівнює
-        // своє тіло по центру; відтворюємо це, якщо користувач не задав
-        // власного вирівнювання таблиці.
+        // У звичайному figure вміст комірок таблиці центрується, бо фігура
+        // вирівнює своє тіло по центру; відтворюємо це, якщо користувач не
+        // задав власного вирівнювання таблиці.
         set table(align: center) if table.align == auto
         fig.body
       },
@@ -237,10 +238,13 @@
   show figure.where(kind: raw): set figure.caption(position: top)
   show figure.where(kind: raw): set align(left)
 
-  // Tables: break across pages with «Продовження таблиці N»; the figure wraps
-  // the show rule output in a block, which must be breakable for that
+  // Tables and listings: break across pages with «Продовження таблиці N»
+  // («Продовження лістингу N»); the figure wraps the show rule output in a
+  // block, which must be breakable for that
   show figure.where(kind: table): set block(breakable: true)
-  show figure.where(kind: table): table-figure
+  show figure.where(kind: table): breakable-figure
+  show figure.where(kind: raw): set block(breakable: true)
+  show figure.where(kind: raw): breakable-figure
 
   // Numbering reset on level 1 headings
   show heading.where(level: 1): it => {
