@@ -1,7 +1,7 @@
 #import "../helpers.typ": *
 #import "../utils.typ": bold, filled-lines, hfill, uline
 #import "forms.typ": *
-#import "common.typ": contents as base-contents, doc-stats, keywords-count, sort-keywords
+#import "common.typ": contents as base-contents, doc-stats, sort-keywords
 
 // Parts of a complex coursework project explanatory note (NURE, new form).
 // Every part takes the dictionary returned by `work` and is a whole page.
@@ -243,7 +243,7 @@
 
     \
 
-    #(sorted-keyword-pairs.map(pair => upper(pair.uk)).join(", "))#keywords-count(keyword-pairs)
+    #(sorted-keyword-pairs.map(pair => upper(pair.uk)).join(", "))
 
     \
 

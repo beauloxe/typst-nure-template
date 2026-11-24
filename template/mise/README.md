@@ -29,7 +29,6 @@ mise run watch
 | `mise run watch` | Перезбирати `main.pdf` при кожному збереженні |
 | `mise run compile` | Зібрати `main.pdf` один раз |
 | `mise run rename` | Скопіювати PDF з назвою для здачі, напр. `ЛБ1_Косач_КУІБ-24-1_СМП.pdf` |
-| `mise run lint` | Перевірити роботу за ДСТУ 3008:2015 |
 | `mise run format` | Відформатувати `src/` |
 | `mise run clean` | Видалити PDF |
 | `mise run update-package-rev` | Оновити пакунок до останнього коміту `main` |

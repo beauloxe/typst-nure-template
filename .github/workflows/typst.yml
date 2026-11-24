@@ -57,24 +57,6 @@ jobs:
             TYPST_PACKAGE_PATH="$packages" typst compile "$template" "build/default-$(basename "$template" .typ).pdf"
           done
           TYPST_PACKAGE_PATH="$packages" typst compile template/mise/src/main.typ build/mise.pdf
-          echo "NURE_PACKAGES=$packages" >> "$GITHUB_ENV"
-
-      # tests/lint.typ позначає кожне навмисне порушення `#expect("правило")`;
-      # лінтер має знайти рівно ці пари «правило, сторінка». Шаблон mise --
-      # стартовий документ роботи, тож має проходити `mise run lint` без зауважень.
-      - name: Lint
-        run: |
-          typst eval --root . --in tests/lint.typ '{
-            import "/src/lint.typ": report, run
-            let found = run()
-            let got = found.map(d => (d.rule, d.page)).sorted()
-            let want = query(<lint-expect>).map(m => (m.value, m.location().page())).sorted()
-            assert(got == want, message: "tests/lint.typ: expected " + repr(want) + ", found:\n" + report(found))
-            "tests/lint.typ: " + str(got.len()) + " expected diagnostics"
-          }'
-          version=$(sed -n 's/^version = "\(.*\)"/\1/p' typst.toml)
-          TYPST_PACKAGE_PATH="$NURE_PACKAGES" typst eval --in template/mise/src/main.typ \
-            "{ import \"@vendor/nure:$version\": lint; lint.check() }"
 
       - name: Check mise template targets this version
         run: |
