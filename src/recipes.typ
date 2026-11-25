@@ -89,7 +89,7 @@
   abstract-en: none,
   bib-path: none,
   appendices: (),
-  faculty: "комп’ютерних наук",
+  faculty: auto,
   education-level: "перший (бакалаврський)",
   program-type: "освітньо-професійна",
   program-name: none,
@@ -133,7 +133,7 @@
 }
 
 /// Рецепт практичних і лабораторних робіт
-/// - layout (str): "default" (те саме, що "nure") або "complex"
+/// - layout (str): "default" (те саме, що "nure"), "complex" або "nure-iki"
 /// - university (str): Код університету, див. src/config/universities.yaml
 /// - edu-program (str): Код освітньої програми, за замовчуванням -- першого автора
 /// - subject (str): Код дисципліни, див. src/config/universities.yaml
@@ -142,6 +142,7 @@
 /// - title (str): Тема роботи
 /// - authors (array): Автори
 /// - mentors (array): Викладачі
+/// - faculty (str): Факультет (за замовчуванням -- з даних освітньої програми)
 /// - skip-heading (bool): Не вставляти тему як заголовок першого рівня
 ///
 /// Титулка складається з чотирьох слотів: header, info, credentials, footer.
@@ -159,6 +160,7 @@
   title: none,
   authors: (),
   mentors: (),
+  faculty: auto,
   skip-heading: false,
   ..title-page,
 ) = {
@@ -171,6 +173,7 @@
     title: title,
     authors: authors,
     mentors: mentors,
+    faculty: faculty,
   )
 
   set document(..w.document)

@@ -45,9 +45,9 @@
 ## Титулки звітів: `report`
 
 ### `report.title-page(w, layout: "default", header: auto, info: auto, credentials: auto, footer: auto)`
-Титулка звіту з лабораторної, практичної тощо. `layout`: `"default"` (те саме, що `"nure"`) або `"complex"`. Слоти: `auto` -- вміст макета, свій вміст -- заміна, `none` -- порожньо. Див. [Лабораторна](lab.md#титульна-сторінка-reporttitle-page).
+Титулка звіту з лабораторної, практичної тощо. `layout`: `"default"` (те саме, що `"nure"`), `"complex"` або `"nure-iki"`. Слоти: `auto` -- вміст макета, свій вміст -- заміна, `none` -- порожньо. Див. [Лабораторна](lab.md#титульна-сторінка-reporttitle-page).
 
-### `report.nure.*`, `report.complex.*`
+### `report.nure.*`, `report.complex.*`, `report.nure-iki.*`
 Вміст слотів кожного макета: `default-header(w)`, `default-info(w)`, `default-credentials(w)`, `default-footer(w)`; та `title-page(w, ...)` конкретного макета.
 
 ### `title-heading(w)`

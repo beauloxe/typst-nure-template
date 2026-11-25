@@ -1,15 +1,17 @@
 #import "nure.typ"
 #import "complex.typ"
+#import "nure-iki.typ"
 
 #let layouts = (
   "default": nure,
   "nure": nure,
   "complex": complex,
+  "nure-iki": nure-iki,
 )
 
 /// Титулка звіту з практичної/лабораторної (ЛБ, ПЗ, КР, ІДЗ).
 ///
-/// - layout (str): "default" (те саме, що "nure") або "complex"
+/// - layout (str): "default" (те саме, що "nure"), "complex" або "nure-iki"
 ///
 /// Сторінка складається з чотирьох слотів: header, info, credentials, footer.
 /// Кожен за замовчуванням заповнюється вмістом макета; його можна замінити,

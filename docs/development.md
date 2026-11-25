@@ -17,7 +17,7 @@ src/
     ├── base.typ          -- розкладка титулки з чотирьох слотів
     ├── common.typ        -- title-heading, contents, doc-stats, dstu-bibliography
     ├── forms.typ         -- поля форм (forms.*)
-    ├── report/           -- титулки звітів: макети nure і complex
+    ├── report/           -- титулки звітів: макети nure, complex і nure-iki
     ├── cw.typ            -- блоки курсової роботи
     └── cw-v2.typ         -- блоки комплексного курсового проєкту
 template/
@@ -36,7 +36,7 @@ docs/                     -- ця документація
 
 `tests/` містить документи, які CI компілює на кожен push:
 
-- `pz-lb.typ`, `pz-lb-complex.typ`, `coursework.typ`, `coursework-v2.typ` -- рецепти;
+- `pz-lb.typ`, `pz-lb-complex.typ`, `pz-lb-nure-iki.typ`, `coursework.typ`, `coursework-v2.typ` -- рецепти;
 - `constructor-*.typ` -- ті самі документи, зібрані з блоків; CI рендерить обидва варіанти в PNG і перевіряє, що вони ідентичні;
 - `constructor-features.typ`, `dstu-figure.typ`, `work-data.typ` -- слоти, рисунки, власні дані й чисті функції (через `assert`);
 - `dstu-equation.typ`, `dstu-footnote.typ` -- номери лише в формул, на які є посилання, і нумерація виносок у межах сторінки (через `assert`);

@@ -5,11 +5,13 @@
     ПЗПІ:
       name-long: Інженерія програмного забезпечення
       department-gen: Програмної інженерії
+      faculty: Комп’ютерних наук
       code: 121 # TODO: change to F2?
       description: Інженерія програмного забезпечення
     КУІБ:
       name-long: Управління інформаційною безпекою
       department-gen: Інфокомунікаційної інженерії ім. В. В. Поповського
+      faculty: Інфокомунікацій
       code: 125 # TODO: change to F5?
       description: Кібербезпека та захист інформації
     КНТ:
@@ -17,6 +19,7 @@
       name-long: Комп'ютерні науки та технології
       department-gen: Системотехніки
       department-en: ST
+      faculty: Комп’ютерних наук
       code: 122
       description: Комп'ютерні науки та інформаційні технології
   subjects:
