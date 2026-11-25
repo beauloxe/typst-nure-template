@@ -48,8 +48,8 @@
   #text(size: 8pt)[(прізвище та ініціали)\ ]
 ]
 
-#let default-footer(w) = [Харків\
-  #w.year]
+#let default-footer(w) = if w.city != none [#w.city\
+  #w.year] else [#w.year]
 
 /// Макет "complex" титулки звіту з практичної/лабораторної (зі спеціальністю
 /// та освітньою програмою на титулці).

@@ -11,6 +11,7 @@
 
 /// Рецепт курсової роботи ХНУРЕ (ДСТУ 3008)
 /// - university (str): Код університету, за замовчуванням "ХНУРЕ"
+/// - edu-program (str): Код освітньої програми, за замовчуванням -- першого автора
 /// - subject (str): Код дисципліни
 /// - title (str): Тема роботи
 /// - authors (array): Словники авторів
@@ -20,9 +21,13 @@
 /// - abstract (dict): Ключові слова і текст реферату
 /// - bib-path (path, bytes): Перелік джерел, напр. `path("bibl.yml")`
 /// - appendices (content): Вміст додатків
+/// - year (int, str): Рік на титулці, за замовчуванням -- з `done-date` або поточний
+/// - city (str, none): Місто на титулці, за замовчуванням -- з даних університету
+/// - data (dictionary): Власні університети, програми й дисципліни, див. `work`
 #let coursework(
   doc,
   university: "ХНУРЕ",
+  edu-program: none,
   subject: none,
   title: none,
   authors: (),
@@ -32,15 +37,22 @@
   abstract: (:),
   bib-path: none,
   appendices: (),
+  year: auto,
+  city: auto,
+  data: (:),
 ) = {
   let w = work(
     university: university,
+    edu-program: edu-program,
     subject: subject,
     title: title,
     authors: authors,
     mentors: mentors,
     initial-date: task-list.at("initial-date", default: none),
     done-date: task-list.at("done-date", default: none),
+    year: year,
+    city: city,
+    data: data,
   )
 
   set document(..w.document)
@@ -66,6 +78,7 @@
 
 /// Рецепт комплексного курсового проєкту ХНУРЕ (ДСТУ 8302)
 /// - university (str): Код університету, за замовчуванням "ХНУРЕ"
+/// - edu-program (str): Код освітньої програми, за замовчуванням -- першого автора
 /// - title (str): Тема роботи
 /// - authors (array): Словники авторів
 /// - mentors (array): Словники викладачів
@@ -76,9 +89,13 @@
 /// - abstract-en (dict): Англійські ключові слова і текст (необов'язково)
 /// - bib-path (path, bytes): Перелік джерел, напр. `path("bibl.yml")`
 /// - appendices (content): Вміст додатків
+/// - year (int, str): Рік на титулці, за замовчуванням -- з `done-date` або поточний
+/// - city (str, none): Місто на титулці, за замовчуванням -- з даних університету
+/// - data (dictionary): Власні університети, програми й дисципліни, див. `work`
 #let coursework-v2(
   doc,
   university: "ХНУРЕ",
+  edu-program: none,
   title: none,
   authors: (),
   mentors: (),
@@ -93,11 +110,13 @@
   education-level: "перший (бакалаврський)",
   program-type: "освітньо-професійна",
   program-name: none,
+  year: auto,
+  city: auto,
+  data: (:),
 ) = {
-  assert(mentors.len() > 0, message: "At least one mentor required")
-
   let w = work(
     university: university,
+    edu-program: edu-program,
     title: title,
     authors: authors,
     mentors: mentors,
@@ -108,6 +127,9 @@
     program-name: program-name,
     initial-date: task-list.at("initial-date", default: none),
     done-date: task-list.at("done-date", default: none),
+    year: year,
+    city: city,
+    data: data,
   )
 
   set document(..w.document)
@@ -143,6 +165,9 @@
 /// - authors (array): Автори
 /// - mentors (array): Викладачі
 /// - faculty (str): Факультет (за замовчуванням -- з даних освітньої програми)
+/// - year (int, str): Рік на титулці, за замовчуванням -- поточний
+/// - city (str, none): Місто на титулці, за замовчуванням -- з даних університету
+/// - data (dictionary): Власні університети, програми й дисципліни, див. `work`
 /// - skip-heading (bool): Не вставляти тему як заголовок першого рівня
 ///
 /// Титулка складається з чотирьох слотів: header, info, credentials, footer.
@@ -161,6 +186,9 @@
   authors: (),
   mentors: (),
   faculty: auto,
+  year: auto,
+  city: auto,
+  data: (:),
   skip-heading: false,
   ..title-page,
 ) = {
@@ -174,6 +202,9 @@
     authors: authors,
     mentors: mentors,
     faculty: faculty,
+    year: year,
+    city: city,
+    data: data,
   )
 
   set document(..w.document)

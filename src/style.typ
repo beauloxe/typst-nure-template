@@ -130,7 +130,6 @@
       caption: caption,
     ) #label]
 }
-}
 
 /// Оформлення за ДСТУ 3008:2015: `#show: style.dstu`
 #let dstu(

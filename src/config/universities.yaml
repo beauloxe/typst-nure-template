@@ -1,6 +1,7 @@
 ХНУРЕ:
   name: Харківський національний університет радіоелектроніки
   name-en: Kharkiv National University of Radioelectronics
+  city: Харків
   edu-programs:
     ПЗПІ:
       name-long: Інженерія програмного забезпечення

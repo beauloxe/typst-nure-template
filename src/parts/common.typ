@@ -1,5 +1,18 @@
 #import "../style.typ": spacing
-#import "../helpers.typ": is-cyr
+#import "../helpers.typ": is-cyr, is-empty
+
+// Спільні перевірки обов'язкових полів для блоків (внутрішні, не експортуються з lib.typ).
+#let require-work(w, key, part) = {
+  let value = w.at(key, default: none)
+  assert(not is-empty(value), message: part + ": work(" + key + ": ...) is required")
+  value
+}
+
+#let require-field(dict, key, label, part) = {
+  let value = dict.at(key, default: none)
+  assert(not is-empty(value), message: part + ": " + label + "." + key + " is required")
+  value
+}
 
 /// Заголовок першого рівня з темою роботи, з якого починається основна частина.
 ///

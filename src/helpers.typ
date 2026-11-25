@@ -19,7 +19,7 @@
 /// перевірка на порожнечу для `none`, `""` і `()`
 #let is-empty(val) = {
   if val == none { return true }
-  if type(val) == str { val.len() == 0 } else if type(val) == array { val == [] } else { false }
+  if type(val) == str or type(val) == array { val.len() == 0 } else { false }
 }
 
 /// значення `key` у словнику або none, якщо ключа немає чи він порожній -- лише
@@ -39,7 +39,7 @@
 
 
 #let gender-get(dict) = if dict.len() == 1 {
-  dict.first().gender
+  dict.first().at("gender", default: none)
 } else if dict.len() > 1 {
   "p"
 } else {

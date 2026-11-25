@@ -1,3 +1,4 @@
+#import "../helpers.typ": key-get
 #import "../utils.typ": ruled-field, uline
 
 // Form-like building blocks: underlined fields with captions below them,
@@ -93,8 +94,8 @@
         linebreak()
       }
       let member-display-name = member.at("display-name", default: member.name)
-      let member-degree = member.at("degree", default: "")
-      uline(align: left, [#member-degree #member-display-name])
+      let member-degree = key-get(member, "degree")
+      uline(align: left, if member-degree != none [#member-degree #member-display-name] else [#member-display-name])
     }
   } else {
     v(0.55em)

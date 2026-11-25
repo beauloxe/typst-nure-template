@@ -1,21 +1,16 @@
 #import "../helpers.typ": *
 #import "../utils.typ": bold, filled-lines, hfill, uline
 #import "forms.typ": *
-#import "common.typ": contents as base-contents, doc-stats, sort-keywords
+#import "common.typ": contents as base-contents, doc-stats, require-field, require-work, sort-keywords
 
 // Parts of a complex coursework project explanatory note (NURE, new form).
 // Every part takes the dictionary returned by `work` and is a whole page.
 
-#let required(w, key, part) = {
-  let value = w.at(key)
-  assert(value != none and value != (), message: "cw-v2." + part + ": work(" + key + ": ...) is required")
-  value
-}
-
 /// Титульна сторінка. Члени комісії за замовчуванням -- усі викладачі, крім першого.
 #let title-page(w) = {
   let author = w.authors.first()
-  let head-mentor = required(w, "mentors", "title-page").first()
+  let head-mentor = require-work(w, "mentors", "cw-v2.title-page").first()
+  let course = require-field(author, "course", "author", "cw-v2.title-page")
   let commission-members = if w.committee-members == none {
     w.mentors.slice(1)
   } else {
@@ -25,7 +20,7 @@
   let group-name = group-form(author)
   let author-display-name = author.at("display-name", default: author.name)
   let mentor-display-name = head-mentor.at("display-name", default: head-mentor.name)
-  let mentor-degree = head-mentor.at("degree", default: "")
+  let mentor-degree = key-get(head-mentor, "degree")
 
   [
     #set par(first-line-indent: 0pt, justify: false, leading: 0.45em)
@@ -71,8 +66,8 @@
       columns: (0.36fr, 0.64fr),
       [],
       [
-        #gender-form("author", gender: author.gender):\
-        здобувач #underline([#author.course]) курсу, групи #underline(group-name)\
+        #gender-form("author", gender: author.at("gender", default: none)):\
+        здобувач #underline([#course]) курсу, групи #underline(group-name)\
         #uline(align: center, author-display-name)
         #note[(Власне ім'я, ПРІЗВИЩЕ)]
 
@@ -84,7 +79,9 @@
         #note[(повна назва освітньої програми)]
 
         #v(0.3em)
-        #inline-label-line([Керівник], [#mentor-degree #mentor-display-name])
+        #inline-label-line([Керівник], if mentor-degree != none [#mentor-degree #mentor-display-name] else [
+          #mentor-display-name
+        ])
         #note[(посада, Власне ім'я, ПРІЗВИЩЕ)]
 
         #v(0.3em)
@@ -111,9 +108,15 @@
 /// - content (content, array): Питання для опрацювання; масив розбивається на підкреслені рядки
 #let task(w, source: [], content: []) = {
   let author = w.authors.first()
-  let done-date = required(w, "done-date", "task")
+  let done-date = require-work(w, "done-date", "cw-v2.task")
+  let course = require-field(author, "course", "author", "cw-v2.task")
+  let semester = require-field(author, "semester", "author", "cw-v2.task")
   let group-name = group-form(author)
-  let author-full-name-dat = author.at("full-name-dat", default: author.full-name-gen)
+  let author-full-name-dat = if key-get(author, "full-name-dat") != none {
+    author.full-name-dat
+  } else {
+    require-field(author, "full-name-gen", "author", "cw-v2.task")
+  }
 
   [
     #set par(first-line-indent: 0pt, justify: false)
@@ -140,7 +143,7 @@
       columns: (1.1fr, 1.1fr, 1.1fr, 1.7fr, 1.3fr, 1.1fr),
       gutter: 0pt,
       align: center + horizon,
-      [Курс], uline(author.course), [Група], uline(group-name), [Семестр], uline(author.semester),
+      [Курс], uline(course), [Група], uline(group-name), [Семестр], uline(semester),
     )
 
     #v(2.6em)
@@ -180,10 +183,10 @@
 /// Календарний план з підписами. Бере `initial-date` з `work`.
 /// - plan-table (content): Таблиця плану
 #let calendar-plan(w, plan-table) = {
-  let head-mentor = required(w, "mentors", "calendar-plan").first()
-  let initial-date = required(w, "initial-date", "calendar-plan")
+  let head-mentor = require-work(w, "mentors", "cw-v2.calendar-plan").first()
+  let initial-date = require-work(w, "initial-date", "cw-v2.calendar-plan")
   let mentor-display-name = head-mentor.at("display-name", default: head-mentor.name)
-  let mentor-degree = head-mentor.at("degree", default: "")
+  let mentor-degree = key-get(head-mentor, "degree")
 
   [
     #align(center, bold[КАЛЕНДАРНИЙ ПЛАН])
@@ -204,7 +207,9 @@
 
     #v(1.4em)
 
-    Керівник роботи #uline(align: center, []) #h(1cm) #underline[#mentor-degree #mentor-display-name]
+    Керівник роботи #uline(align: center, []) #h(1cm) #underline(if mentor-degree != none [
+      #mentor-degree #mentor-display-name
+    ] else [#mentor-display-name])
     #note[(підпис) #h(4.5cm) (посада, Власне ім'я, ПРІЗВИЩЕ)]
 
     #pagebreak()

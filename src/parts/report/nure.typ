@@ -40,7 +40,7 @@
   })
 }
 
-#let default-footer(w) = [Харків -- #w.year]
+#let default-footer(w) = if w.city != none [#w.city -- #w.year] else [#w.year]
 
 /// Макет ХНУРЕ титулки звіту з практичної/лабораторної.
 ///

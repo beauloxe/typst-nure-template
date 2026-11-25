@@ -1,5 +1,21 @@
 #import "shared.typ": universities
-#import "helpers.typ": deep-merge
+#import "helpers.typ": deep-merge, is-empty
+
+#let _validate-people(people, label, required-keys) = {
+  assert(std.type(people) == array, message: "work: " + label + " must be an array")
+  for (i, person) in people.enumerate() {
+    assert(
+      std.type(person) == dictionary,
+      message: "work: " + label + "[" + str(i) + "] must be a dictionary",
+    )
+    for key in required-keys {
+      assert(
+        key in person and not is-empty(person.at(key)),
+        message: "work: " + label + "[" + str(i) + "] must have `" + key + "`",
+      )
+    }
+  }
+}
 
 /// Нормалізований опис роботи, спільний для всіх блоків.
 ///
@@ -27,6 +43,7 @@
 /// - initial-date (datetime): Дата видачі завдання
 /// - done-date (datetime): Термін здачі роботи
 /// - year (int, str): Рік на титулці, за замовчуванням -- з `done-date` або поточний
+/// - city (str, none): Місто на титулці, за замовчуванням -- з даних університету
 /// - data (dictionary): Власні університети, освітні програми й дисципліни у
 ///   форматі `config/universities.yaml`, накладаються на вбудовані,
 ///   напр. `data: yaml("my-data.yaml")`
@@ -47,6 +64,7 @@
   initial-date: none,
   done-date: none,
   year: auto,
+  city: auto,
   data: (:),
 ) = {
   let universities = if data == none { universities } else { deep-merge(universities, data) }
@@ -55,7 +73,12 @@
     university in universities,
     message: "work: unknown university " + repr(university) + ", expected one of " + repr(universities.keys()),
   )
+  _validate-people(authors, "authors", ("name", "group"))
   assert(authors.len() > 0, message: "work: at least one author is required")
+  _validate-people(mentors, "mentors", ("name",))
+  if committee-members != none {
+    _validate-people(committee-members, "committee-members", ("name",))
+  }
 
   let uni = universities.at(university)
   assert("name" in uni, message: "work: university " + repr(university) + " has no `name`")
@@ -69,6 +92,11 @@
   for key in ("name-long", "department-gen", "code") {
     assert(key in edu, message: "work: edu-program " + repr(edu-program) + " has no `" + key + "`")
   }
+  let authors = authors.map(a => if "edu-program" in a and not is-empty(a.at("edu-program")) {
+    a
+  } else {
+    a + (edu-program: edu-program)
+  })
 
   (
     university: university,
@@ -90,6 +118,7 @@
     initial-date: initial-date,
     done-date: done-date,
     year: if year != auto { year } else if done-date != none { done-date.year() } else { datetime.today().year() },
+    city: if city != auto { city } else { uni.at("city", default: none) },
     // arguments for `set document`
     document: (
       title: if std.type(title) == array { title.join(" ") } else { title },

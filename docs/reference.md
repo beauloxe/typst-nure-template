@@ -19,11 +19,12 @@
 
 | Поле | Значення |
 | --- | --- |
-| `w.uni` | Дані університету (`name`, `edu-programs`, `subjects`) |
+| `w.uni` | Дані університету (`name`, `city`, `edu-programs`, `subjects`) |
 | `w.edu` | Дані освітньої програми (`name-long`, `department-gen`, `code`, …) |
 | `w.subject-name` | Повна назва дисципліни |
 | `w.program-name` | Назва освітньої програми |
 | `w.year` | Рік для титулки |
+| `w.city` | Місто для титулки (`none`, якщо не задано) |
 | `w.document` | Аргументи для `#set document(..w.document)`: тема й автори |
 
 ### `universities`

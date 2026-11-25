@@ -1,20 +1,15 @@
 #import "../helpers.typ": *
 #import "../utils.typ": bold, hfill, uline
-#import "common.typ": contents as base-contents, doc-stats, sort-keywords
+#import "common.typ": contents as base-contents, doc-stats, require-field, require-work, sort-keywords
 
 // Parts of a coursework explanatory note (NURE). Every part takes the
 // dictionary returned by `work` and is a whole page (or several).
 
-#let required-date(w, key, part) = {
-  let date = w.at(key)
-  assert(date != none, message: "cw." + part + ": work(" + key + ": ...) is required")
-  date
-}
-
 /// Титульна сторінка.
 #let title-page(w) = {
   let author = w.authors.first()
-  let head-mentor = w.mentors.first()
+  let head-mentor = require-work(w, "mentors", "cw.title-page").first()
+  let head-degree = key-get(head-mentor, "degree")
 
   [
     #set align(center)
@@ -38,10 +33,10 @@
       #set align(left)
       #set par(first-line-indent: 0pt)
 
-      #gender-form("author", gender: author.gender) ст. гр. #group-form(author)
+      #gender-form("author", gender: author.at("gender", default: none)) ст. гр. #group-form(author)
 
       \
-      Керівник:\ #head-mentor.degree
+      Керівник:#if head-degree != none [\ #head-degree]
 
       \
       Робота захищена на оцінку
@@ -70,7 +65,7 @@
 
     #v(1fr)
 
-    Харків -- #w.year
+    #if w.city != none [#w.city -- ]#w.year
 
     #pagebreak()
   ]
@@ -82,8 +77,11 @@
 /// - graphics (content): Перелік графічного матеріалу
 #let task(w, source: [], content: [], graphics: []) = {
   let author = w.authors.first()
-  let done-date = required-date(w, "done-date", "task")
-  let initial-date = required-date(w, "initial-date", "task")
+  let done-date = require-work(w, "done-date", "cw.task")
+  let initial-date = require-work(w, "initial-date", "cw.task")
+  let course = require-field(author, "course", "author", "cw.task")
+  let semester = require-field(author, "semester", "author", "cw.task")
+  let full-name-gen = require-field(author, "full-name-gen", "author", "cw.task")
 
   uline[#w.uni.name]
 
@@ -108,9 +106,7 @@
   grid(
     columns: (1fr, 1fr, 1fr),
     gutter: 0.3fr,
-    [#bold[Курс] #uline(author.course)],
-    [#bold[Група] #uline([#author.edu-program\-#author.group])],
-    [#bold[Семестр] #uline(author.semester)],
+    [#bold[Курс] #uline(course)], [#bold[Група] #uline(group-form(author))], [#bold[Семестр] #uline(semester)],
   )
 
   linebreak()
@@ -121,7 +117,7 @@
 
   linebreak()
 
-  uline(align: left)[_#author.full-name-gen _]
+  uline(align: left)[_#full-name-gen _]
 
   linebreak()
   linebreak()
@@ -168,8 +164,9 @@
 /// - approval-date (datetime): Дата затвердження, за замовчуванням `done-date`
 #let calendar-plan(w, plan-table, approval-date: auto) = {
   let author = w.authors.first()
-  let head-mentor = w.mentors.first()
-  let approval-date = if approval-date == auto { required-date(w, "done-date", "calendar-plan") } else {
+  let head-mentor = require-work(w, "mentors", "cw.calendar-plan").first()
+  let head-degree = key-get(head-mentor, "degree")
+  let approval-date = if approval-date == auto { require-work(w, "done-date", "cw.calendar-plan") } else {
     approval-date
   }
 
@@ -204,8 +201,7 @@
     ),
     [
       #author.name, \
-      #head-mentor.degree
-      #head-mentor.name.
+      #if head-degree != none [#head-degree ]#head-mentor.name.
     ],
   )
 
