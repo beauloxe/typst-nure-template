@@ -1,0 +1,9 @@
+[language-server.dsty]
+command = "dsty"
+args = ["lsp"]
+# Helix передає це як initializationOptions
+config = { main = "src/main.typ", debounce = 150 }
+
+[[language]]
+name = "typst"
+language-servers = ["tinymist", "dsty"]

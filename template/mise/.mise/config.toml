@@ -7,6 +7,7 @@ lockfile = true
 typst = "latest"
 typstyle = "latest"
 tinymist = "latest"
+"github:linerds/dsty" = { version = "latest", prerelease = "true", minimum_release_age = "0" }
 
 [vars]
 vendor_dir = "{{config_root}}/vendor"
@@ -45,6 +46,11 @@ run = "typst watch {{vars.work_input_file}} {{vars.work_output_file}}"
 [tasks.format]
 description = "Відформатувати src/ за допомогою typstyle"
 run = "typstyle -l 120 -i {{config_root}}/src"
+
+[tasks.lint]
+description = "Перевірити документ за допомогою dsty"
+depends = ["fetch-nure-package"]
+run = "dsty check --full {{config_root}}/src/main.typ"
 
 # Кожен рядок -- окрема команда git, без shell-скрипта, тож працює на будь-якій ОС.
 # `git init` на вже створеному репозиторії нічого не ламає. Задача виконується лише
