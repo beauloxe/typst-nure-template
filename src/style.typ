@@ -433,7 +433,19 @@
   }
 
   // Headings
-  set heading(numbering: _heading-numbering)
+  set heading(
+    numbering: _heading-numbering,
+    supplement: it => {
+      let lvl = if it.has("level") and it.level != auto {
+        it.level
+      } else if it.has("depth") {
+        it.depth
+      } else {
+        1
+      }
+      ([Розділ], [Підрозділ], [Пункт], [Підпункт]).at(calc.min(lvl, 4) - 1)
+    },
+  )
   show heading: it => {
     set text(size: 14pt)
     if it.level == 1 {

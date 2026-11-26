@@ -213,6 +213,7 @@ int main(void) {
 
 ## Перелік джерел
 
+| `@sec` / `@sub` / `@pt` | Розділ 1 / Підрозділ 1.1 / Пункт 1.1.1 |
 Джерела записуються у файл `bibl.yml` (формат [Hayagriva](https://github.com/typst/hayagriva/blob/main/docs/file-format.md)):
 
 ```yaml
