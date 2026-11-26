@@ -266,5 +266,5 @@
   ]
 }
 
-/// Зміст, де додатки подано як "Додаток А Назва".
-#let contents() = base-contents(compact-appendices: true)
+/// Зміст без підзаголовків додатків.
+#let contents(..args) = base-contents(compact-appendices: true, ..args)

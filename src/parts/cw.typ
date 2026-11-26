@@ -225,4 +225,4 @@
 ]
 
 /// Зміст.
-#let contents() = base-contents()
+#let contents(..args) = base-contents(..args)

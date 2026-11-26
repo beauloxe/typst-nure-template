@@ -37,17 +37,17 @@
   }
 }
 
-/// Зміст.
+/// Зміст (ДСТУ 3008:2015, 4.4, Додаток Б).
 ///
-/// - compact-appendices (bool): Подавати додатки як "Додаток А Назва" і
-///   приховувати їхні підзаголовки
-#let contents(compact-appendices: false) = {
+/// - compact-appendices (bool): Приховувати підзаголовки додатків
+/// - depth (int, none): Глибина заголовків у змісті (типово 3 -- розділи, підрозділи й пункти)
+#let contents(compact-appendices: false, depth: 3) = {
   show outline.entry: it => {
     let el = it.element
 
-    if compact-appendices and el.func() == heading and el.supplement == [Додаток] {
+    if el.func() == heading and el.supplement == [Додаток] {
       if el.level > 1 {
-        none
+        if compact-appendices { none } else { it }
       } else {
         block(width: 100%)[
           #link(el.location())[
@@ -60,12 +60,11 @@
     }
   }
 
+  heading(level: 1, numbering: none, outlined: false)[ЗМІСТ]
+  block(width: 100%, above: 0pt, below: spacing, align(right)[с.])
   outline(
-    title: [
-      ЗМІСТ
-      #v(spacing * 2, weak: true)
-    ],
-    depth: 2,
+    title: none,
+    depth: depth,
     indent: auto,
   )
 }
