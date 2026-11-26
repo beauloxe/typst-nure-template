@@ -8,6 +8,97 @@
 /// Українська абетка для нумерації за ДСТУ 3008:2015
 #let ukr-enum = "абвгдежиклмнпрстуфхцшщюя".clusters()
 
+// Обхідне рішення для переліків без висячого відступу (ДСТУ 3008:2015, 7.7.4):
+// вбудовані `list` і `enum` у Typst завжди вирівнюють перенесені рядки під
+// початком тексту пункту (https://github.com/typst/typst/issues/5751).
+// Розкладаємо кожен пункт у звичайний абзац потоку (аналогічно до `show block`
+// у `dstu-bibliography`): перший рядок зміщується на накопичений відступ рівня
+// плюс маркер і `body-indent`, а перенесені рядки йдуть від лівого берега.
+// `body` не загортається в `context`, тож довільна глибина вкладення збігається
+// за два проходи верстки. Коли Typst підтримає hanging-indent для списків --
+// приберіть ці правила.
+#let _list-indents = state("dstu-list-indents", ())
+#let _list-depth = state("dstu-list-depth", 0)
+#let _enum-parents = state("dstu-enum-parents", ())
+
+#let _ukr-numbering(i) = ukr-enum.at(i - 1) + ")"
+
+#let _flat-item(body-indent, make-prefix, body) = {
+  parbreak()
+  context {
+    let ind = _list-indents.get().sum(default: 0pt)
+    h(ind - par.first-line-indent.amount)
+    let prefix = make-prefix()
+    if prefix != none {
+      box(prefix)
+      h(body-indent)
+    }
+  }
+  body
+  parbreak()
+}
+
+#let _flat-list(it) = {
+  if it.children.len() == 0 { return }
+  _list-indents.update(s => s + (it.indent,))
+  _list-depth.update(d => d + 1)
+  {
+    set par(first-line-indent: (all: true))
+    set par(spacing: it.spacing) if it.spacing != auto
+    for child in it.children {
+      let make-prefix() = {
+        let d = _list-depth.get() - 1
+        if type(it.marker) == array {
+          it.marker.at(calc.rem(d, it.marker.len()))
+        } else if type(it.marker) == function {
+          it.marker(d)
+        } else {
+          it.marker
+        }
+      }
+      _flat-item(it.body-indent, make-prefix, child.body)
+    }
+  }
+  _list-depth.update(d => d - 1)
+  _list-indents.update(s => s.slice(0, -1))
+}
+
+#let _flat-enum(it) = {
+  if it.children.len() == 0 { return }
+  let num = if it.start != auto {
+    it.start
+  } else if it.reversed {
+    it.children.len()
+  } else {
+    1
+  }
+  let step = if it.reversed { -1 } else { 1 }
+  _list-indents.update(s => s + (it.indent,))
+  {
+    set par(first-line-indent: (all: true))
+    set par(spacing: it.spacing) if it.spacing != auto
+    set enum(numbering: "1)") if it.numbering == _ukr-numbering
+    for child in it.children {
+      let explicit = child.at("number", default: auto)
+      let cur = if explicit != auto { explicit } else { num }
+      if cur != none {
+        num = cur + step
+        _enum-parents.update(p => p + (cur,))
+      }
+      let make-prefix() = if cur == none {
+        none
+      } else if it.full {
+        numbering(it.numbering, .._enum-parents.get())
+      } else {
+        numbering(it.numbering, cur)
+      }
+      _flat-item(it.body-indent, make-prefix, child.body)
+      if cur != none { _enum-parents.update(p => p.slice(0, -1)) }
+    }
+  }
+  _list-indents.update(s => s.slice(0, -1))
+}
+
 /// Номер поточного додатка (`none` поза додатками), для нумерації в посиланнях
 #let appendix-index = state("appendix-index", none)
 
@@ -181,13 +272,12 @@
   set block(spacing: spacing)
   set underline(evade: false)
 
-  // Lists
-  set enum(indent: indent-size, body-indent: 0.5cm, numbering: i => ukr-enum.at(i - 1) + ")")
-  show enum: it => {
-    set enum(indent: 0em, numbering: "1)")
-    it
-  }
-  set list(indent: indent-size + 0.1cm, body-indent: 0.5cm, marker: [--])
+  // Lists (7.7.2, 7.7.4): а) -> 1) -> --; кожен рівень зсувається на абзацний
+  // відступ, перенесені рядки повертаються до лівого берега без висячого відступу
+  set enum(indent: indent-size, body-indent: 0.5cm, numbering: _ukr-numbering)
+  set list(indent: indent-size, body-indent: 0.5cm, marker: [--])
+  show list: _flat-list
+  show enum: _flat-enum
 
   // Footnotes (7.9.2, 7.9.5, 7.9.6): «1)» над рядком; текст з абзацного
   // відступу, кеглем 12 через один інтервал; лінія 35 мм від лівого берега
@@ -210,12 +300,10 @@
     }
 
     let is-dstu-fig = (
-      target.func() == figure
-        and target.numbering in (_section-figure-numbering, _appendix-figure-numbering)
+      target.func() == figure and target.numbering in (_section-figure-numbering, _appendix-figure-numbering)
     )
     let is-dstu-eq = (
-      target.func() == math.equation
-        and target.numbering in (_section-equation-numbering, _appendix-equation-numbering)
+      target.func() == math.equation and target.numbering in (_section-equation-numbering, _appendix-equation-numbering)
     )
 
     if not is-dstu-fig and not is-dstu-eq {

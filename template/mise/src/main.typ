@@ -15,9 +15,6 @@
 #set document(..w.document)
 #show: style.dstu.with(skip: 1)
 
-// Правило з utils.typ
-// #show: correctly-indent-list-and-enum-items
-
 #report.title-page(w) // layout: "complex", footer: [...] тощо
 #title-heading(w)
 
