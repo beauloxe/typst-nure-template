@@ -17,6 +17,22 @@
 #assert.eq(work(..data, subject: "Нова дисципліна").subject-name, "Нова дисципліна")
 #assert.eq(work(..data, program-name: "Своя").program-name, "Своя")
 #assert.eq(sort-keywords(("b", "a", "я", "а")), ("а", "я", "a", "b"))
+#assert.eq(
+  sort-keywords((
+    "Яблуко",
+    "Їжак",
+    "Ґрунт",
+    "Інформація",
+    "Єдність",
+    "алгоритм",
+    "База",
+    "база даних",
+    "базовий",
+    "Zebra",
+    "alpha",
+  )),
+  ("алгоритм", "База", "база даних", "базовий", "Ґрунт", "Єдність", "Інформація", "Їжак", "Яблуко", "alpha", "Zebra"),
+)
 
 #set document(..w.document)
 #show: style.dstu.with(skip: 3)

@@ -88,12 +88,28 @@
   counters.join(", ")
 }
 
-/// Сортує ключові слова реферату: спершу кирилиця, далі за абеткою.
+#let _uk-alphabet = "абвгґдеєжзиіїйклмнопрстуфхцчшщьюя".clusters()
+#let _uk-base = str.to-unicode("а")
+
+// Перекладає українські літери в послідовні коди Unicode від «а», щоб звичайне
+// рядкове сортування давало правильний порядок (ДСТУ 3008:2015, 4.3.8).
+#let _uk-sort-key(s) = {
+  let s = lower(s)
+  (
+    (if is-cyr(s) { "0" } else { "1" })
+      + s
+        .clusters()
+        .map(c => {
+          let i = _uk-alphabet.position(ch => ch == c)
+          if i != none { str.from-unicode(_uk-base + i) } else { c }
+        })
+        .join()
+  )
+}
+
+/// Сортує ключові слова реферату: спершу кирилиця за українською абеткою, далі латиниця.
 /// - key (function): Повертає рядок, за яким сортується елемент
-#let sort-keywords(keywords, key: it => it) = keywords.sorted(by: (a, b) => {
-  let (a, b) = (key(a), key(b))
-  if is-cyr(a) != is-cyr(b) { is-cyr(a) } else { a < b }
-})
+#let sort-keywords(keywords, key: it => it) = keywords.sorted(key: it => _uk-sort-key(key(it)))
 
 #let csl-styles = (
   "3008": "../csl/dstu-3008-2015.csl",
