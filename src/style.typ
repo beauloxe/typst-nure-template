@@ -319,7 +319,7 @@
     all: true,
   ))
   set block(spacing: spacing)
-  set underline(evade: false)
+  set underline(evade: false, offset: 0.22em, stroke: 0.5pt)
 
   // Lists (7.7.2, 7.7.4): а) -> 1) -> --; кожен рівень зсувається на абзацний
   // відступ, перенесені рядки повертаються до лівого берега без висячого відступу

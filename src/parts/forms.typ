@@ -1,5 +1,5 @@
 #import "../helpers.typ": key-get
-#import "../utils.typ": ruled-field, uline
+#import "../utils.typ": ruled-field
 
 // Form-like building blocks: underlined fields with captions below them,
 // as used on official NURE pages (title page, task). Reusable in custom parts.
@@ -15,7 +15,7 @@
 #let form-field(alignment: center, content) = box(
   width: 100%,
   stroke: (bottom: 0.5pt),
-  inset: (bottom: 1.5pt),
+  inset: (bottom: 2.5pt),
 )[
   #align(alignment)[#content]
 ]
@@ -79,31 +79,28 @@
 /// номер пункту завдання "N."
 #let task-num(n) = box(str(n) + ".")
 
-/// поле теми роботи; тема-масив з'єднується
+/// поле теми роботи; тема-масив з'єднується, кожен рядок підкреслено на всю ширину
 #let title-field(value) = {
-  uline(align: center, if type(value) == array { value.join() } else { value })
-  uline(align: center, [])
+  ruled-field(align(center, if type(value) == array { value.join() } else { value }))
   note[(тема)]
 }
 
 /// по лінії на кожного члена комісії або три порожні лінії
 #let commission-lines(members) = {
   if members.len() > 0 {
-    for (i, member) in members.enumerate() {
-      if i > 0 {
-        linebreak()
-      }
-      let member-display-name = member.at("display-name", default: member.name)
-      let member-degree = key-get(member, "degree")
-      uline(align: left, if member-degree != none [#member-degree #member-display-name] else [#member-display-name])
-    }
+    stack(
+      spacing: 0.45em,
+      ..members.map(member => {
+        let member-display-name = member.at("display-name", default: member.name)
+        let member-degree = key-get(member, "degree")
+        ruled-field(if member-degree != none [#member-degree #member-display-name] else [#member-display-name])
+      }),
+    )
   } else {
-    v(0.55em)
-    line(length: 100%, stroke: 0.5pt)
-    v(0.55em)
-    line(length: 100%, stroke: 0.5pt)
-    v(0.55em)
-    line(length: 100%, stroke: 0.5pt)
+    block(width: 100%, inset: (top: 0.55em), stack(
+      spacing: 1.1em,
+      ..range(3).map(_ => line(length: 100%, stroke: 0.5pt)),
+    ))
   }
 }
 

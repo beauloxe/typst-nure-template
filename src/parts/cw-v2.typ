@@ -1,5 +1,5 @@
 #import "../helpers.typ": *
-#import "../utils.typ": bold, filled-lines, hfill, uline
+#import "../utils.typ": bold, ruled-field
 #import "forms.typ": *
 #import "common.typ": contents as base-contents, doc-stats, require-field, require-work, sort-keywords
 
@@ -68,7 +68,7 @@
       [
         #gender-form("author", gender: author.at("gender", default: none)):\
         здобувач #underline([#course]) курсу, групи #underline(group-name)\
-        #uline(align: center, author-display-name)
+        #form-field(author-display-name)
         #note[(Власне ім'я, ПРІЗВИЩЕ)]
 
         #v(0.2em)
@@ -104,8 +104,8 @@
 }
 
 /// Сторінка завдання. Бере `done-date` з `work`.
-/// - source (content, array): Вихідні дані; масив розбивається на підкреслені рядки
-/// - content (content, array): Питання для опрацювання; масив розбивається на підкреслені рядки
+/// - source (content, array): Вихідні дані (рядки підкреслюються автоматично)
+/// - content (content, array): Питання для опрацювання (рядки підкреслюються автоматично)
 #let task(w, source: [], content: []) = {
   let author = w.authors.first()
   let done-date = require-work(w, "done-date", "cw-v2.task")
@@ -140,10 +140,10 @@
 
     #v(1.7em)
     #grid(
-      columns: (1.1fr, 1.1fr, 1.1fr, 1.7fr, 1.3fr, 1.1fr),
-      gutter: 0pt,
-      align: center + horizon,
-      [Курс], uline(course), [Група], uline(group-name), [Семестр], uline(semester),
+      columns: (auto, 1fr, auto, 1.8fr, auto, 1fr),
+      column-gutter: 0.5em,
+      align: center + bottom,
+      [Курс], form-field(course), [Група], form-field(group-name), [Семестр], form-field(semester),
     )
 
     #v(2.6em)
@@ -159,22 +159,23 @@
 
     #v(1.0em)
 
-    #task-num(1) Тема роботи #uline(align: left, filled-lines(w.title))
+    #ruled-field(prefix: [#task-num(1) Тема роботи], w.title)
 
-    #v(0.4em)
+    #v(0.5em)
     #task-num(2) Термін здачі студентом закінченої роботи
     “#underline(done-date.display("[day]"))” #underline(month-gen(done-date.month())) #done-date.display("[year]")р.
 
-    #v(0.4em)
-    #task-num(3) Вихідні дані до проєкту #uline(align: left, filled-lines(source))
-    #v(0.4em)
-    #uline(align: left, [])
+    #v(0.5em)
+    #ruled-field(prefix: [#task-num(3) Вихідні дані до проєкту], source)
+    #v(0.5em)
+    #ruled-field([])
 
-    #v(0.4em)
-    #task-num(4) Перелік питань, що потрібно опрацювати в роботі\
-    #uline(align: left, filled-lines(content))
-    #v(0.4em)
-    #uline(align: left, [])
+    #v(0.5em)
+    #task-num(4) Перелік питань, що потрібно опрацювати в роботі
+    #v(0.3em)
+    #ruled-field(content)
+    #v(0.5em)
+    #ruled-field([])
 
     #pagebreak()
   ]
@@ -202,15 +203,27 @@
 
     #v(1.4em)
 
-    Здобувач #underline([#hfill(6cm)])
-    #note[(підпис) #h(8cm)]
+    #let mentor-line = if mentor-degree != none [#mentor-degree #mentor-display-name] else [#mentor-display-name]
+
+    #grid(
+      columns: (auto, 6cm),
+      column-gutter: 0.4em,
+      row-gutter: 0.15em,
+      align: (left + bottom, center + bottom),
+      [Здобувач], form-field([]),
+      [], note[(підпис)],
+    )
 
     #v(1.4em)
 
-    Керівник роботи #uline(align: center, []) #h(1cm) #underline(if mentor-degree != none [
-      #mentor-degree #mentor-display-name
-    ] else [#mentor-display-name])
-    #note[(підпис) #h(4.5cm) (посада, Власне ім'я, ПРІЗВИЩЕ)]
+    #grid(
+      columns: (auto, 4.5cm, 1fr),
+      column-gutter: (0.4em, 1cm),
+      row-gutter: 0.15em,
+      align: (left + bottom, center + bottom, center + bottom),
+      [Керівник роботи], form-field([]), form-field(mentor-line),
+      [], note[(підпис)], note[(посада, Власне ім'я, ПРІЗВИЩЕ)],
+    )
 
     #pagebreak()
   ]

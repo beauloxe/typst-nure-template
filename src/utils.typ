@@ -17,63 +17,55 @@
   if indent.all { h(-indent.amount) }
 }
 
-/// заповнює горизонтальний простір невидимим текстом (для підкреслень)
-#let hfill(width) = box(width: width, repeat(" "))  // HAIR SPACE (U+200A)
-
-/// масив рядків -> рядки, заповнені до кінця, для підкреслених полів завдання
-#let filled-lines(content) = if type(content) == array {
-  content.map(line => [#line #hfill(1fr)]).join(linebreak())
-} else {
-  content
-}
-
-/// підкреслене поле, вміст за замовчуванням по центру
-#let uline(align: center, content) = underline[
-  #if align != left { hfill(1fr) }
-  #content
-  #if align != right { hfill(1fr) }
-]
-
-// HACK: Typst cannot underline "empty space". The `underline` element follows
-// the text extents, and a box/cell bottom stroke only draws under the last
-// line, so a field whose value wraps gets a rule on at most one line. This
-// measures the value's height, derives the number of lines from it, and
-// places a rule under each line box, so every wrapped line gets a full-width
-// rule no matter where its words end.
-//
-// Note the geometry: rules sit at `line-height + k * line-distance`, NOT at
-// `k * (height / lines)` -- Typst puts the leading between lines only, so the
-// first line box is shorter than the step between the following ones, and a
-// uniform split of the measured height puts the first rule inside the
-// second line's ascenders.
-//
-// Constraints:
-// - the value must have a uniform line height (a single font and size),
-//   otherwise the rules drift away from the text lines;
-// - it must be laid out inside a proper region (a grid cell or similar):
-//   `layout`'s bounds are unreliable in a plain inline run and the line count
-//   comes out wrong.
-// If a native per-line rule ever lands in Typst, replace this wholesale.
-#let ruled-field(value, stroke: 0.5pt, leading-frac: 0.45, offset: 0.1em) = layout(bounds => context {
+/// Поле з підкресленням кожного фактичного рядка при автоматичному переносі.
+///
+/// Typst не вміє підкреслювати порожній простір до правого краю на рядках із
+/// автопереносом, тому функція вимірює висоту блока тексту й малює тонку лінію
+/// під кожним рядком.
+///
+/// - value (content, str, array): Значення поля (масив з'єднується пробілом)
+/// - prefix (content, none): Непідкреслений префікс на початку першого рядка
+///   (напр. `[1. Тема роботи]`); лінія першого рядка починається після нього
+/// - min-lines (int): Мінімальна кількість підкреслених рядків
+/// - stroke (stroke): Стиль лінії підкреслення
+/// - leading-frac (float): Міжрядковий інтервал у частках розміру шрифту
+/// - offset (length): Зміщення лінії вниз від базової лінії рядка
+#let ruled-field(
+  value,
+  prefix: none,
+  min-lines: 1,
+  stroke: 0.5pt,
+  leading-frac: 0.5,
+  offset: 0.2em,
+) = layout(bounds => context {
+  let val = if type(value) == array { value.join([ ]) } else { value }
   let fs = text.size
   let leading = leading-frac * fs
   let lh = measure(text(size: fs)[Ay]).height // one line box
   let dist = lh + leading // step between consecutive line bottoms
+  let pw = if prefix != none { measure(prefix).width + 0.35em.to-absolute() } else { 0pt }
+  let body = if prefix != none { [#prefix#h(0.35em)#val] } else { val }
   let h = measure(block(width: bounds.width)[
-    #set par(justify: false, leading: leading)
-    #value
+    #set par(justify: false, leading: leading, first-line-indent: 0pt)
+    #body
   ]).height
-  let n = int(calc.max(1, calc.round((h - lh) / dist) + 1)) // number of lines
-  // `offset` drops the rules a little below the line boxes so they don't
-  // clip through descenders (у, р, щ, ...); the block grows to match
-  block(width: 100%, height: h + offset)[
+  let n = int(calc.max(min-lines, if h > 0pt { calc.round((h - lh) / dist) + 1 } else { 1 }))
+  // `offset` drops the rules below descenders (у, р, щ, ...); block grows to match
+  block(width: 100%, height: lh + (n - 1) * dist + offset)[
     #for k in range(n) {
-      place(top + left, dy: lh + k * dist + offset, line(length: 100%, stroke: stroke))
+      let dx = if k == 0 { pw } else { 0pt }
+      place(top + left, dx: dx, dy: lh + k * dist + offset, line(length: bounds.width - dx, stroke: stroke))
     }
-    #set par(justify: false, leading: leading)
-    #value
+    #set par(justify: false, leading: leading, first-line-indent: 0pt)
+    #body
   ]
 })
+
+/// підкреслене поле на всю ширину (короткий запис `ruled-field` із вирівнюванням)
+#let uline(align: center, ..args, content) = {
+  let body = if type(content) == array { content.join([ ]) } else { content }
+  ruled-field(if align == left { body } else { std.align(align, body) }, ..args)
+}
 
 /// Підпис рисунка з приміткою про джерело
 #let img-caption(base-caption, source) = {

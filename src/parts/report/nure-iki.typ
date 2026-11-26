@@ -1,5 +1,5 @@
 #import "../../helpers.typ": gender-form, gender-get, group-form, is-empty, key-get
-#import "../../utils.typ": bold, hfill, ruled-field
+#import "../../utils.typ": bold, ruled-field
 #import "../base.typ": title-page as base-title-page
 #import "../forms.typ": inline-label-line
 
@@ -86,7 +86,7 @@
       if i > 0 { v(0.6em) }
       let course = key-get(a, "course")
       let student-prefix = if course != none [
-        студент #underline(stroke: 0.5pt, offset: 0.25em)[#hfill(0.4em)#course#hfill(0.4em)] курсу, групи
+        студент #box(stroke: (bottom: 0.5pt), inset: (x: 0.4em, bottom: 2.5pt), baseline: 2.5pt)[#course] курсу, групи
       ] else [
         студент групи
       ]

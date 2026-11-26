@@ -66,7 +66,7 @@
 | `cw.abstract(w, keywords: (), body)` | Реферат |
 | `cw.contents()` | Зміст |
 | `cw-v2.title-page(w)` | Титулка комплексного курсового проєкту |
-| `cw-v2.task(w, source: [], content: [])` | Завдання; потребує `done-date`; масив -- окремі підкреслені рядки |
+| `cw-v2.task(w, source: [], content: [])` | Завдання; потребує `done-date`; перенесені рядки підкреслюються автоматично |
 | `cw-v2.calendar-plan(w, plan-table)` | Календарний план з підписами; потребує `initial-date` |
 | `cw-v2.abstract(w, keywords: (), en-keywords: none, ..body)` | Реферат; `body` -- текст, за ним необов'язково англійський |
 | `cw-v2.contents()` | Зміст з додатками у вигляді «Додаток А Назва» |
@@ -105,10 +105,8 @@
 | `utils.nheading(title)` | Ненумерований заголовок першого рівня («Вступ», «Висновки») |
 | `utils.noindent` | Знімає абзацний відступ з рядка, перед яким стоїть: пояснення «де …» під формулою (7.10.6). Див. [Формули](writing.md#формули) |
 | `utils.bold(content)` | Напівжирний текст |
-| `utils.uline(align: center, content)` | Підкреслене поле на всю ширину |
-| `utils.hfill(width)` / `hfill(width)` | Невидимий текст заданої ширини, щоб підкреслення тяглося |
-| `utils.filled-lines(lines)` | Масив рядків → рядки, заповнені до кінця (для підкреслених полів) |
-| `utils.ruled-field(value)` | Поле, де підкреслено кожен рядок при переносі |
+| `utils.uline(align: center, ..args, content)` | Підкреслене поле на всю ширину (короткий запис `ruled-field` із вирівнюванням) |
+| `utils.ruled-field(value, prefix: none, min-lines: 1)` | Поле, де кожен фактичний рядок підкреслено на всю ширину при переносі |
 | `utils.img-caption(caption, source)` | Підпис з приміткою про джерело |
 
 ## Поля форм: `forms`

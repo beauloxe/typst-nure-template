@@ -1,5 +1,6 @@
 #import "../helpers.typ": *
-#import "../utils.typ": bold, hfill, uline
+#import "../utils.typ": bold, ruled-field
+#import "forms.typ": form-field
 #import "common.typ": contents as base-contents, doc-stats, require-field, require-work, sort-keywords
 
 // Parts of a coursework explanatory note (NURE). Every part takes the
@@ -83,77 +84,67 @@
   let semester = require-field(author, "semester", "author", "cw.task")
   let full-name-gen = require-field(author, "full-name-gen", "author", "cw.task")
 
-  uline[#w.uni.name]
-
-  linebreak()
-  linebreak()
-
-  grid(
-    columns: (100pt, 1fr),
-    bold[
-      Кафедра
-      Дисципліна
-      Спеціальність
-    ],
-    {
-      uline(align: left, w.edu.department-gen)
-      linebreak()
-      uline(align: left, w.subject-name)
-      linebreak()
-      uline(align: left, [#w.edu.code #w.edu.name-long])
-    },
-  )
-  grid(
-    columns: (1fr, 1fr, 1fr),
-    gutter: 0.3fr,
-    [#bold[Курс] #uline(course)], [#bold[Група] #uline(group-form(author))], [#bold[Семестр] #uline(semester)],
-  )
-
-  linebreak()
-  linebreak()
-  linebreak()
-
-  align(center, bold[ЗАВДАННЯ \ на курсову роботу студента])
-
-  linebreak()
-
-  uline(align: left)[_#full-name-gen _]
-
-  linebreak()
-  linebreak()
-
-  bold[\1. Тема роботи:]
-  uline[#w.title.]
-
-  linebreak()
-
   {
-    bold[\2. Строк здачі закінченої роботи:]
-    uline(done-date.display("[day].[month].[year]"))
-    hfill(10fr)
-  }
+    set par(first-line-indent: 0pt, justify: false)
 
-  linebreak()
+    ruled-field(align(center, w.uni.name))
 
-  bold[\3. Вихідні дані для роботи:]
-  uline(source)
+    v(1.2em)
 
-  linebreak()
+    grid(
+      columns: (100pt, 1fr),
+      row-gutter: 0.55em,
+      align: top,
+      bold[Кафедра], ruled-field(w.edu.department-gen),
+      bold[Дисципліна], ruled-field(w.subject-name),
+      bold[Спеціальність], ruled-field([#w.edu.code #w.edu.name-long]),
+    )
 
-  bold[\4. Зміст розрахунково-пояснювальної записки:]
-  uline(content)
+    v(0.8em)
 
-  linebreak()
+    grid(
+      columns: (auto, 1fr, auto, 1.6fr, auto, 1fr),
+      column-gutter: 0.5em,
+      align: bottom,
+      bold[Курс], form-field(course), bold[Група], form-field(group-form(author)), bold[Семестр], form-field(semester),
+    )
 
-  bold[\5. Перелік графічного матеріалу:]
-  uline(graphics)
+    v(2.0em)
 
-  linebreak()
+    align(center, bold[ЗАВДАННЯ \ на курсову роботу студента])
 
-  {
-    bold[\6. Дата видачі завдання:]
-    uline(initial-date.display("[day].[month].[year]"))
-    hfill(10fr)
+    v(0.8em)
+
+    ruled-field[_#full-name-gen _]
+
+    v(1.2em)
+
+    ruled-field(prefix: bold[\1. Тема роботи:], [#w.title.])
+    v(0.6em)
+
+    grid(
+      columns: (auto, 4cm),
+      column-gutter: 0.4em,
+      align: bottom,
+      bold[\2. Строк здачі закінченої роботи:], form-field(done-date.display("[day].[month].[year]")),
+    )
+    v(0.6em)
+
+    ruled-field(prefix: bold[\3. Вихідні дані для роботи:], source)
+    v(0.6em)
+
+    ruled-field(prefix: bold[\4. Зміст розрахунково-пояснювальної записки:], content)
+    v(0.6em)
+
+    ruled-field(prefix: bold[\5. Перелік графічного матеріалу:], graphics)
+    v(0.6em)
+
+    grid(
+      columns: (auto, 4cm),
+      column-gutter: 0.4em,
+      align: bottom,
+      bold[\6. Дата видачі завдання:], form-field(initial-date.display("[day].[month].[year]")),
+    )
   }
 
   pagebreak()
@@ -181,23 +172,17 @@
 
   grid(
     columns: (5fr, 5fr),
+    column-gutter: 0.8em,
     grid(
-      columns: (1fr, 2fr, 1fr),
-      gutter: 0.2fr,
-      [
-        Студент \
-        Керівник \
-        #align(center)["#underline[#approval-date.day()]"]
-      ],
-      [
-        #uline(align: center, []) \
-        #uline(align: center, []) \
-        #uline(align: center, month-gen(approval-date.month()))
-      ],
-      [
-        \ \
-        #underline[#approval-date.year()] р.
-      ],
+      columns: (auto, 1fr, auto),
+      column-gutter: 0.4em,
+      row-gutter: 0.6em,
+      align: bottom,
+      [Студент], form-field([]), [],
+      [Керівник], form-field([]), [],
+      align(center)["#underline[#approval-date.day()]"],
+      form-field(month-gen(approval-date.month())),
+      [#underline[#approval-date.year()] р.],
     ),
     [
       #author.name, \

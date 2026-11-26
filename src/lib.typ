@@ -7,7 +7,6 @@
 #let dstu-table = style.dstu-table
 #let dstu-figure = utils.dstu-figure
 #let dstu-note = style.dstu-note
-#let hfill = utils.hfill
 
 // Constructor: work data + parts, assembled by the author.
 #import "./work.typ": work
