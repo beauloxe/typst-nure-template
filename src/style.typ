@@ -1,4 +1,4 @@
-#import "utils.typ": bold
+#import "utils.typ": _format-notes, bold
 /// Константи оформлення
 #let spacing = 0.95em
 #let indent-size = 1.25cm
@@ -130,7 +130,8 @@
 // маркерів початку й кінця фігури (позиція фігури як ключ працює, але в рази повільніше).
 #let figure-seq = counter("dstu-figure-seq")
 
-// Напис над продовженням фігури на новій сторінці; на першій її сторінці -- нічого.
+// Напис над продовженням фігури на новій сторінці з абзацного відступу (7.6.9);
+// на першій її сторінці -- нічого.
 #let continuation-label(noun, num, start-key, end-key) = context {
   let start = query(metadata.where(value: start-key)).first().location().page()
   if here().page() == start { return }
@@ -157,8 +158,8 @@
   )
 }
 
-// Оформлення таблиці- чи лістингу-`figure` за ДСТУ: підпис ліворуч над
-// фігурою, перенос між сторінками з написом «Продовження таблиці N»
+// Оформлення таблиці- чи лістингу-`figure` за ДСТУ: підпис з абзацного відступу
+// над фігурою, перенос між сторінками з написом «Продовження таблиці N»
 // («Продовження лістингу N»). Вміст користувача не перебудовується, а
 // обгортається в сітку з однією колонкою: шапка сітки повторюється на кожній
 // сторінці й несе напис, а єдина комірка -- сама таблиця чи код, як є. Тому
@@ -235,6 +236,23 @@
   value
 }
 
+/// Примітка або кілька приміток за ДСТУ 3008:2015 (7.8, 7.1.24):
+/// одна не нумерується («Примітка. …»), дві й більше нумеруються
+/// («Примітка 1. …», «Примітка 2. …»); кегль 12, одинарний інтервал,
+/// абзацний відступ, відступ `double-spacing` від тексту.
+///
+/// - ..notes (content): Текст примітки (один або кілька аргументів, або масив)
+#let dstu-note(..notes) = {
+  let items = notes.pos()
+  if items.len() == 1 and type(items.first()) == array {
+    items = items.first()
+  }
+  if items.len() == 0 { return }
+  v(double-spacing, weak: true)
+  _format-notes(items)
+  v(double-spacing, weak: true)
+}
+
 /// Таблиця з підписом -- скорочення для `figure(table(table.header(..header), ..), caption: ..)`.
 /// Перенос між сторінками з написом «Продовження таблиці N» `style.dstu`
 /// оформлює для будь-якої таблиці-`figure`, тож ця функція -- лише зручність.
@@ -242,10 +260,11 @@
 /// - caption (content): Назва таблиці
 /// - columns (int, array): Кількість або ширини колонок
 /// - header (array): Комірки шапки, напр. `([A], [B])`
+/// - note (content, array, none): Примітка або масив приміток у межах таблиці під основною частиною (7.8.2)
 /// - label (label): Мітка для посилань, напр. `<my-table>`
 /// - tag (str): Те саме рядком (для сумісності зі старими версіями)
 /// - ..args: Передаються в `table` (комірки, `align`, `stroke`, ...)
-#let dstu-table(caption: none, columns: none, header: none, label: none, tag: none, ..args) = {
+#let dstu-table(caption: none, columns: none, header: none, note: none, label: none, tag: none, ..args) = {
   let caption = _required("caption", caption)
   let columns = _required("columns", columns)
   let header = _required("header", header)
@@ -253,9 +272,24 @@
     panic("dstu-table: header must be an array, e.g. ([A], [B])")
   }
   let label = if label != none { label } else if tag != none { std.label(tag) }
+  let col-count = if type(columns) == int {
+    columns
+  } else if type(columns) == array {
+    columns.len()
+  } else {
+    1
+  }
 
   [#figure(
-      table(columns: columns, ..args.named(), table.header(..header), ..args.pos()),
+      table(
+        columns: columns,
+        ..args.named(),
+        table.header(..header),
+        ..args.pos(),
+        ..if note != none {
+          (table.footer(repeat: false, table.cell(colspan: col-count, align: left, _format-notes(note))),)
+        },
+      ),
       caption: caption,
     ) #label]
 }
@@ -372,6 +406,7 @@
   show figure.caption.where(kind: table): _indented-caption
   show figure.where(kind: raw): set figure.caption(position: top)
   show figure.where(kind: raw): set align(left)
+  show figure.caption.where(kind: raw): _indented-caption
 
   // Tables and listings: break across pages with «Продовження таблиці N»
   // («Продовження лістингу N»); the figure wraps the show rule output in a
@@ -413,7 +448,6 @@
 
   // Нумерують лише ті формули, на які є посилання (7.10.2). Формула без
   // посилання виводиться без номера, а лічильник повертається назад, тож
-  show figure.caption.where(kind: raw): _indented-caption
   // номери решти йдуть без пропусків. Явне `numbering: none` не чіпається.
   show math.equation.where(block: true): it => {
     if it.numbering == none { return it }

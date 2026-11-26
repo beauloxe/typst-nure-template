@@ -6,6 +6,7 @@
 
 #let dstu-table = style.dstu-table
 #let dstu-figure = utils.dstu-figure
+#let dstu-note = style.dstu-note
 #let hfill = utils.hfill
 
 // Constructor: work data + parts, assembled by the author.
@@ -23,3 +24,4 @@
 #let tab = dstu-table
 #let fig = dstu-figure
 #let bib = dstu-bibliography
+#let note = dstu-note

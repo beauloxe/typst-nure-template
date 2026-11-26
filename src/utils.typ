@@ -86,6 +86,24 @@
   }
 }
 
+// Внутрішнє форматування приміток (ДСТУ 3008:2015, 7.8.3, 7.8.4):
+// кегль 12, одинарний інтервал, абзацний відступ; одна не нумерується
+// («Примітка. …»), дві й більше -- «Примітка 1. …», «Примітка 2. …».
+#let _format-notes(notes) = {
+  let items = if type(notes) == array { notes } else { (notes,) }
+  if items.len() == 0 { return }
+  set align(left)
+  set text(size: 12pt)
+  set par(leading: 0.65em, spacing: 0.65em, first-line-indent: (all: true))
+  if items.len() == 1 {
+    par[Примітка. #items.first()]
+  } else {
+    for (i, item) in items.enumerate() {
+      par[Примітка #(i + 1). #item]
+    }
+  }
+}
+
 /// рисунок з підписом і приміткою про джерело
 /// Використання: dstu-figure(path("figures/image.png"), [Підпис], "джерело" (необов'язково), label: <x>)
 ///
@@ -93,6 +111,7 @@
 ///   у пакунку, а не у вашому проєкті
 /// - caption (content): Підпис рисунка
 /// - source (str, none): Джерело рисунка; `none` -- "(рисунок виконано самостійно)"
+/// - note (content, array, none): Примітка або масив приміток під рисунком перед назвою (7.5.9, 7.8.2)
 /// - label (label, none): Мітка рисунка
 /// - ..args: Передаються в `image` (width, height, fit, ...)
 #let dstu-figure(file, caption, ..args) = {
@@ -102,6 +121,14 @@
   let source = args.pos().at(0, default: ())
   let named = args.named()
   let lbl = named.remove("label", default: none)
+  let note = named.remove("note", default: none)
 
-  [#figure(image(file, ..named), caption: img-caption(caption, source)) #lbl]
+  let img = image(file, ..named)
+  let body = if note != none {
+    stack(spacing: 0.5em, img, block(width: 100%, _format-notes(note)))
+  } else {
+    img
+  }
+
+  [#figure(body, kind: image, caption: img-caption(caption, source)) #lbl]
 }

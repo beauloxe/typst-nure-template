@@ -6,8 +6,9 @@
 
 | Коротко | Повна назва | Опис |
 | --- | --- | --- |
-| `fig(file, caption, source, label: none, ..args)` | [`dstu-figure`](#dstu-figurefile-caption-source-label-none-args) | Рисунок |
-| `tab(caption:, columns:, header:, label: none, ..args)` | [`dstu-table`](#dstu-tablecaption-columns-header-label-none-tag-none-args) | Таблиця |
+| `fig(file, caption, source, note: none, label: none, ..args)` | [`dstu-figure`](#dstu-figurefile-caption-source-note-none-label-none-args) | Рисунок |
+| `tab(caption:, columns:, header:, note: none, label: none, ..args)` | [`dstu-table`](#dstu-tablecaption-columns-header-note-none-label-none-tag-none-args) | Таблиця |
+| `note(..notes)` | [`dstu-note`](#dstu-notenotes) | Примітка |
 | `bib(source, style: "3008", ..)` | [`dstu-bibliography`](#dstu-bibliographysource-style-3008-title-перелік-джерел-посилання-full-true) | Перелік джерел |
 
 Короткі й повні назви -- одні й ті самі функції: аргументи й результат однакові. Див. [Короткі назви](writing.md#короткі-назви).
@@ -86,13 +87,16 @@
 ### `sort-keywords(keywords, key: it => it)`
 Сортує ключові слова без урахування регістру: спершу кирилиця за українською абеткою, далі латиниця.
 
-## Таблиці й рисунки
+## Таблиці, рисунки й примітки
 
-### `dstu-table(caption:, columns:, header:, label: none, tag: none, ..args)`
-Скорочення для `figure(table(table.header(..header), ..args), caption: caption)` (ще коротше -- `tab`). `header` -- масив комірок шапки, `label` -- мітка (`<x>`), `tag` -- те саме рядком (для сумісності); решта передається в `table`. Перенос з «Продовження таблиці» `style.dstu` оформлює для будь-якої таблиці-`figure`. Див. [Таблиці](writing.md#таблиці).
+### `dstu-table(caption:, columns:, header:, note: none, label: none, tag: none, ..args)`
+Скорочення для `figure(table(table.header(..header), ..args), caption: caption)` (ще коротше -- `tab`). `header` -- масив комірок шапки, `note` -- примітка або масив приміток під основною частиною таблиці (7.8.2), `label` -- мітка (`<x>`), `tag` -- те саме рядком (для сумісності); решта передається в `table`. Перенос з «Продовження таблиці» `style.dstu` оформлює для будь-якої таблиці-`figure`. Див. [Таблиці](writing.md#таблиці).
 
-### `dstu-figure(file, caption, source, label: none, ..args)`
-Рисунок з підписом і приміткою про джерело (коротко -- `fig`). `file` -- `path(...)`; `source` (необов'язковий третій аргумент): не вказано або `()` -- без примітки, `none` -- «(рисунок виконано самостійно)», рядок -- «(за даними …)»; `label` -- мітка (`<x>`), без неї рисунок без мітки; решта передається в `image`. Є й як `utils.dstu-figure`. Див. [Рисунки](writing.md#рисунки).
+### `dstu-figure(file, caption, source, note: none, label: none, ..args)`
+Рисунок з підписом і приміткою про джерело (коротко -- `fig`). `file` -- `path(...)`; `source` (необов'язковий третій аргумент): не вказано або `()` -- без примітки, `none` -- «(рисунок виконано самостійно)», рядок -- «(за даними …)»; `note` -- примітка або масив приміток під зображенням перед назвою (7.5.9, 7.8.2); `label` -- мітка (`<x>`), без неї рисунок без мітки; решта передається в `image`. Є й як `utils.dstu-figure`. Див. [Рисунки](writing.md#рисунки).
+
+### `dstu-note(..notes)`
+Примітка або кілька приміток у тексті за ДСТУ 3008:2015 (7.8, 7.1.24; коротко -- `note`): один аргумент дає «Примітка. …», кілька (або масив) -- «Примітка 1. …», «Примітка 2. …»; кегль 12, одинарний інтервал, абзацний відступ, відступ `double-spacing` від тексту. Див. [Примітки](writing.md#примітки).
 
 ## Утиліти: `utils`
 
