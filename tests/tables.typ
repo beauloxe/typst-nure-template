@@ -16,14 +16,19 @@
 #set grid(stroke: 2pt + red, inset: 10pt) // must not leak into the table wrapper
 
 = Довгі таблиці
-#figure(
-  table(
-    columns: (1fr, 2fr),
-    table.header([A], [B]),
-    ..rows(150),
-  ),
-  caption: [З шапкою],
-) <long>
+#[
+  #show "Таблиця": it => [#box[]<cap-pos>#it]
+  #show "Продовження": it => [#box[]<cont-pos>#it]
+  #show "Кінець": it => [#box[]<end-pos>#it]
+  #figure(
+    table(
+      columns: (1fr, 2fr),
+      table.header([A], [B]),
+      ..rows(150),
+    ),
+    caption: [З шапкою],
+  ) <long>
+]
 #figure(table(columns: 2, ..rows(150)), caption: [Вузька без шапки])
 #figure(
   {
@@ -41,6 +46,21 @@
     let (start, end) = spans(n)
     assert(end > start, message: "table " + str(n) + " must span several pages")
   }
+  // 7.6.8, 7.6.9: підпис таблиці та «Продовження / Кінець таблиці» мають абзацний відступ
+  let left = page.margin.left.length
+  let indent = par.first-line-indent.amount
+  assert(
+    calc.abs(locate(<cap-pos>).position().x - (left + indent)) < 0.5pt,
+    message: "table caption must have first-line indent",
+  )
+  assert(
+    calc.abs(locate(<cont-pos>).position().x - (left + indent)) < 0.5pt,
+    message: "continuation label must have first-line indent",
+  )
+  assert(
+    calc.abs(locate(<end-pos>).position().x - (left + indent)) < 0.5pt,
+    message: "end label must have first-line indent",
+  )
 }
 
 = Таблиці користувача

@@ -135,10 +135,26 @@
   let start = query(metadata.where(value: start-key)).first().location().page()
   if here().page() == start { return }
   let end = query(metadata.where(value: end-key)).first().location().page()
-  set par(first-line-indent: 0pt)
-  block(inset: (bottom: table-caption-gap))[
-    #if here().page() == end [Кінець] else [Продовження] #noun#if num != none [ #num]
-  ]
+  set par(first-line-indent: (all: true))
+  block(
+    width: 100%,
+    inset: (bottom: table-caption-gap),
+    par[#if here().page() == end [Кінець] else [Продовження] #noun#if num != none [ #num]],
+  )
+}
+
+// Підпис таблиці або лістингу з абзацного відступу (ДСТУ 3008:2015, 7.6.8):
+// стандартний `figure.caption` не застосовує `par.first-line-indent`, тому
+// загортаємо вміст підпису в `par`.
+#let _indented-caption(it) = {
+  set align(left)
+  set par(first-line-indent: (all: true))
+  block(
+    width: 100%,
+    par[#if it.supplement != none and it.numbering != none [#it.supplement~#context it.counter.display(
+          it.numbering,
+        )#it.separator]#it.body],
+  )
 }
 
 // Оформлення таблиці- чи лістингу-`figure` за ДСТУ: підпис ліворуч над
@@ -167,7 +183,6 @@
     if fig.caption != none {
       block(sticky: true, below: fig.gap, width: 100%, {
         set align(left)
-        set par(first-line-indent: 0pt)
         fig.caption
       })
     }
@@ -354,7 +369,7 @@
   }
   set figure.caption(separator: [ -- ])
   show figure.where(kind: table): set figure.caption(position: top)
-  show figure.caption.where(kind: table): set align(left)
+  show figure.caption.where(kind: table): _indented-caption
   show figure.where(kind: raw): set figure.caption(position: top)
   show figure.where(kind: raw): set align(left)
 
@@ -391,6 +406,7 @@
 
   // Нумерують лише ті формули, на які є посилання (7.10.2). Формула без
   // посилання виводиться без номера, а лічильник повертається назад, тож
+  show figure.caption.where(kind: raw): _indented-caption
   // номери решти йдуть без пропусків. Явне `numbering: none` не чіпається.
   show math.equation.where(block: true): it => {
     if it.numbering == none { return it }
