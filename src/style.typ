@@ -337,8 +337,13 @@
     amount: indent-size,
     all: true,
   ))
-  // запис виноски -- не абзац, тож без обгортки відступ першого рядка не діє
-  show footnote.entry: it => par(it)
+  // запис виноски -- не абзац, тож без обгортки відступ першого рядка не діє;
+  // також додаємо пробіл між знаком виноски «1)» і текстом
+  show footnote.entry: it => {
+    let loc = it.note.location()
+    let num = numbering(it.note.numbering, ..counter(footnote).at(loc))
+    par[#link(loc, super(num))#h(0.25em)#it.note.body]
+  }
 
   // Figures and equations with section/appendix numbering
   show ref: it => {
@@ -506,9 +511,11 @@
   }
 
   // blocks `like this` aren't welcome, so ` is replaced with "
+  // Typst scales `raw` to 0.8em by default; 1.25em restores the surrounding text size
+  // so inline code matches 14pt body, 12pt notes/footnotes, and 10pt form captions.
   show raw.where(block: false): it => text(
     lang: "uk",
-    size: 14pt,
+    size: 1.25em,
     hyphenate: false,
     weight: "regular",
     font: ("Times New Roman", "Liberation Serif"),

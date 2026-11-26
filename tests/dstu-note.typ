@@ -14,7 +14,11 @@
 
 #[
   #show "Примітка": it => [#box[]<n1-start>#it]
-  #dstu-note[Одна примітка до тексту, досить довга, щоб перенестися на другий рядок і показати відсутність висячого відступу: #lorem(18).]
+  #show "raw-check": it => context {
+    assert(calc.abs(text.size - 12pt) < 0.01pt, message: "inline raw in note must stay 12pt, got " + repr(text.size))
+    it
+  }
+  #dstu-note[Одна примітка до тексту з `raw-check`, досить довга, щоб перенестися на другий рядок і показати відсутність висячого відступу: #lorem(18).]
 ]
 
 #box[]<p-after>Звичайний абзац після примітки.
