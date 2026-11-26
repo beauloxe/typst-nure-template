@@ -11,6 +11,17 @@
 /// Номер поточного додатка (`none` поза додатками), для нумерації в посиланнях
 #let appendix-index = state("appendix-index", none)
 
+#let _section-figure-numbering(i) = context numbering("1.1", counter(heading).get().at(0), i)
+#let _section-equation-numbering(i) = context numbering("(1.1)", counter(heading).get().at(0), i)
+// Функція замість рядка `"(1)"`, щоб у посиланнях (`@eq`) Typst не знімав дужки (ДСТУ 3008:2015, 7.10.2)
+#let _continuous-equation-numbering(i) = numbering("(1)", i)
+#let _appendix-figure-numbering(i) = context {
+  upper(ukr-enum.at(counter(heading).get().at(0) - 1)) + "." + str(i)
+}
+#let _appendix-equation-numbering(i) = context {
+  [(#upper(ukr-enum.at(counter(heading).get().at(0) - 1)).#str(i))]
+}
+
 /// Відступ між підписом таблиці (лістингу) й нею та під написом «Продовження таблиці»
 #let table-caption-gap = 0.65em
 
@@ -136,6 +147,7 @@
   it,
   skip: 0,
   offset: 0,
+  section-numbering: true,
 ) = {
   // Page setup
   set page(
@@ -177,7 +189,7 @@
   // запис виноски -- не абзац, тож без обгортки відступ першого рядка не діє
   show footnote.entry: it => par(it)
 
-  // Figures
+  // Figures and equations with section/appendix numbering
   show ref: it => {
     let target = it.element
 
@@ -185,7 +197,16 @@
       return it
     }
 
-    if target.func() != figure and target.func() != math.equation {
+    let is-dstu-fig = (
+      target.func() == figure
+        and target.numbering in (_section-figure-numbering, _appendix-figure-numbering)
+    )
+    let is-dstu-eq = (
+      target.func() == math.equation
+        and target.numbering in (_section-equation-numbering, _appendix-equation-numbering)
+    )
+
+    if not is-dstu-fig and not is-dstu-eq {
       return it
     }
 
@@ -247,14 +268,26 @@
 
   // Numbering reset on level 1 headings
   show heading.where(level: 1): it => {
-    counter(math.equation).update(0)
-    counter(figure.where(kind: raw)).update(0)
-    counter(figure.where(kind: image)).update(0)
-    counter(figure.where(kind: table)).update(0)
+    if section-numbering {
+      context {
+        if math.equation.numbering == _section-equation-numbering {
+          counter(math.equation).update(0)
+        }
+        if figure.numbering == _section-figure-numbering {
+          counter(figure.where(kind: raw)).update(0)
+          counter(figure.where(kind: image)).update(0)
+          counter(figure.where(kind: table)).update(0)
+        }
+      }
+    }
     it
   }
-  set figure(numbering: i => context numbering("1.1", counter(heading).get().at(0), i))
-  set math.equation(numbering: i => context numbering("(1.1)", counter(heading).get().at(0), i))
+  set figure(numbering: if section-numbering { _section-figure-numbering } else { "1" })
+  set math.equation(numbering: if section-numbering {
+    _section-equation-numbering
+  } else {
+    _continuous-equation-numbering
+  })
 
   // Нумерують лише ті формули, на які є посилання (7.10.2). Формула без
   // посилання виводиться без номера, а лічильник повертається назад, тож
@@ -322,17 +355,22 @@
   set heading(numbering: (i, ..n) => upper(ukr-enum.at(i - 1)) + numbering(".1.1", ..n))
   set heading(supplement: [Додаток])
 
-  let app-letter = context upper(ukr-enum.at(counter(heading).get().at(0) - 1))
-  set figure(numbering: i => app-letter + "." + str(i))
-  set math.equation(numbering: i => [(#app-letter.#str(i))])
+  set figure(numbering: _appendix-figure-numbering)
+  set math.equation(numbering: _appendix-equation-numbering)
 
   show heading: h => {
     set text(size: 14pt)
     if h.level == 1 {
-      counter(math.equation).update(0)
-      counter(figure.where(kind: raw)).update(0)
-      counter(figure.where(kind: image)).update(0)
-      counter(figure.where(kind: table)).update(0)
+      context {
+        if math.equation.numbering == _appendix-equation-numbering {
+          counter(math.equation).update(0)
+        }
+        if figure.numbering == _appendix-figure-numbering {
+          counter(figure.where(kind: raw)).update(0)
+          counter(figure.where(kind: image)).update(0)
+          counter(figure.where(kind: table)).update(0)
+        }
+      }
       appendix-index.update(counter(heading).get().at(0))
 
       set align(center)
