@@ -398,11 +398,18 @@
     it
   }
   set figure(numbering: if section-numbering { _section-figure-numbering } else { "1" })
-  set math.equation(numbering: if section-numbering {
-    _section-equation-numbering
-  } else {
-    _continuous-equation-numbering
-  })
+  set math.equation(
+    numbering: if section-numbering {
+      _section-equation-numbering
+    } else {
+      _continuous-equation-numbering
+    },
+    // У багаторядкових формулах номер проставляють на рівні останнього рядка (7.10.4)
+    number-align: end + bottom,
+  )
+
+  // Відстань від попереднього й наступного тексту не менше ніж один рядок (7.10.1)
+  show math.equation.where(block: true): set block(above: double-spacing, below: double-spacing)
 
   // Нумерують лише ті формули, на які є посилання (7.10.2). Формула без
   // посилання виводиться без номера, а лічильник повертається назад, тож
