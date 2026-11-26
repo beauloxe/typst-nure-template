@@ -11,6 +11,16 @@
 /// Номер поточного додатка (`none` поза додатками), для нумерації в посиланнях
 #let appendix-index = state("appendix-index", none)
 
+#let _heading-numbering(..n) = {
+  let nums = n.pos()
+  while nums.len() > 0 and nums.first() == 0 {
+    nums = nums.slice(1)
+  }
+  if nums.len() > 0 {
+    numbering("1.1", ..nums)
+  }
+}
+
 #let _section-figure-numbering(i) = context numbering("1.1", counter(heading).get().at(0), i)
 #let _section-equation-numbering(i) = context numbering("(1.1)", counter(heading).get().at(0), i)
 // Функція замість рядка `"(1)"`, щоб у посиланнях (`@eq`) Typst не знімав дужки (ДСТУ 3008:2015, 7.10.2)
@@ -104,8 +114,10 @@
   v(double-spacing, weak: true)
   block(width: 100%, spacing: 0em)[
     #h(indent-size)
-    #counter(heading).display(num)
-    #it.body
+    #if it.numbering != none {
+      counter(heading).display(if num == auto { it.numbering } else { num })
+      [ ]
+    }#it.body
   ]
   v(double-spacing, weak: true)
 }
@@ -310,7 +322,7 @@
   }
 
   // Headings
-  set heading(numbering: "1.1")
+  set heading(numbering: _heading-numbering)
   show heading: it => {
     set text(size: 14pt)
     if it.level == 1 {
@@ -321,7 +333,7 @@
       v(double-spacing, weak: true)
     } else {
       set text(weight: "regular")
-      heading-block(it, num: if it.level == 3 { it.numbering } else { auto })
+      heading-block(it)
     }
   }
 
