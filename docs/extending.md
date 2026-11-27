@@ -59,7 +59,15 @@
 
 ## Свій вигляд тексту
 
-Встановлені після `#show: style.dstu` правила `set` і `show` діють поверх оформлення пакунка:
+Для типових відхилень від ДСТУ (наприклад, інший вигляд заголовків на кафедрі або моноширинний інлайн-код) у модулі `style.overrides` є готові show-правила -- див. [Оверрайди](reference.md#оверрайди-styleoverrides):
+
+```typst
+#show: style.dstu.with(skip: 1, section-numbering: false)
+#show: style.overrides.plain-heading
+#show: style.overrides.inline-code.with(fill: luma(242))
+```
+
+Усі правила `set` і `show`, встановлені після `#show: style.dstu`, діють поверх оформлення пакунка, тож власні оверрайди чи кафедральні пресети легко зібрати у функцію-обгортку в `utils.typ`:
 
 ```typst
 #show: style.dstu.with(skip: 1)

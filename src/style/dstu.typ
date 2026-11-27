@@ -1,9 +1,10 @@
-#import "utils.typ": _format-notes, bold
+#import "../utils.typ": _format-notes, bold
 /// Константи оформлення
 #let spacing = 0.95em
 #let indent-size = 1.25cm
 #let double-spacing = spacing * 2
 #let double-half-spacing = spacing * 2.5
+#let code-font = ("Courier New", "Liberation Mono")
 
 /// Українська абетка для нумерації за ДСТУ 3008:2015
 #let ukr-enum = "абвгдежиклмнпрстуфхцшщюя".clusters()
@@ -121,6 +122,17 @@
 }
 #let _appendix-equation-numbering(i) = context {
   [(#upper(ukr-enum.at(counter(heading).get().at(0) - 1)).#str(i))]
+}
+
+#let _reset-section-counters() = context {
+  if math.equation.numbering == _section-equation-numbering {
+    counter(math.equation).update(0)
+  }
+  if figure.numbering == _section-figure-numbering {
+    counter(figure.where(kind: raw)).update(0)
+    counter(figure.where(kind: image)).update(0)
+    counter(figure.where(kind: table)).update(0)
+  }
 }
 
 /// Відступ між підписом таблиці (лістингу) й нею та під написом «Продовження таблиці»
@@ -424,16 +436,7 @@
   // Numbering reset on level 1 headings
   show heading.where(level: 1): it => {
     if section-numbering {
-      context {
-        if math.equation.numbering == _section-equation-numbering {
-          counter(math.equation).update(0)
-        }
-        if figure.numbering == _section-figure-numbering {
-          counter(figure.where(kind: raw)).update(0)
-          counter(figure.where(kind: image)).update(0)
-          counter(figure.where(kind: table)).update(0)
-        }
-      }
+      _reset-section-counters()
     }
     it
   }
@@ -504,7 +507,7 @@
     let code-spacing = 0.5em
     set block(spacing: code-spacing)
     set par(spacing: code-spacing, leading: code-spacing)
-    set text(size: 11pt, weight: "semibold", font: ("Courier New", "Liberation Mono"))
+    set text(size: 11pt, weight: "semibold", font: code-font)
     v(double-half-spacing, weak: true)
     pad(it, left: indent-size)
     v(double-half-spacing, weak: true)
@@ -528,7 +531,11 @@
 #let appendices(it) = {
   counter(heading).update(0)
 
-  set heading(numbering: (i, ..n) => upper(ukr-enum.at(i - 1)) + numbering(".1.1", ..n))
+  let appendix-numbering = (i, ..n) => upper(ukr-enum.at(i - 1)) + numbering(".1.1", ..n)
+  set heading(numbering: appendix-numbering)
+  // Перекриває зовнішнє `show heading.where(level: 1): set heading(numbering: none)`
+  // (напр. зі `style.overrides.plain-heading`), щоб додатки все одно нумерувалися
+  show heading.where(level: 1): set heading(numbering: appendix-numbering)
   set heading(supplement: [Додаток])
 
   set figure(numbering: _appendix-figure-numbering)

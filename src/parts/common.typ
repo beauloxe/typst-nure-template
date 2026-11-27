@@ -1,4 +1,4 @@
-#import "../style.typ": spacing
+#import "../style/dstu.typ": spacing
 #import "../helpers.typ": is-cyr, is-empty
 
 // Спільні перевірки обов'язкових полів для блоків (внутрішні, не експортуються з lib.typ).

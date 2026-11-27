@@ -42,8 +42,22 @@
 ### `style.appendices`
 Оформлення додатків: `#show: style.appendices`. Див. [Додатки](writing.md#додатки).
 
+### Оверрайди: `style.overrides`
+Готові show-правила, які перевизначають окремі елементи `style.dstu`. Ставляться після `#show: style.dstu`:
+
+```typst
+#show: style.dstu.with(skip: 1, section-numbering: false)
+#show: style.overrides.plain-heading
+#show: style.overrides.inline-code
+```
+
+| Функція | Опис |
+| --- | --- |
+| `style.overrides.plain-heading(numbering: none, alignment: center, weight: "regular", size: 14pt, uppercase: true, pagebreak: false, above: double-spacing, below: double-spacing)` | Заголовки 1-го рівня без номера, по центру, звичайним накресленням, великими літерами й без розриву сторінки; `numbering: auto` лишає нумерацію зі `style.dstu` |
+| `style.overrides.inline-code(font: code-font, size: auto, weight: "regular", fill: none, stroke: none, inset: (x: 0.25em), outset: (y: 0.2em), radius: 2pt)` | Моноширинний інлайн-код (`` `код` ``) замість лапок у Times New Roman; із `fill` або `stroke` загортається в `box` |
+
 ### Константи
-`style.spacing` (міжрядковий інтервал, для `#v(-spacing)`), `style.indent-size` (абзацний відступ 1,25 см), `style.double-spacing`, `style.ukr-enum` (абетка для нумерації).
+`style.spacing` (міжрядковий інтервал, для `#v(-spacing)`), `style.indent-size` (абзацний відступ 1,25 см), `style.double-spacing`, `style.code-font` (шрифт коду), `style.ukr-enum` (абетка для нумерації).
 
 ## Титулки звітів: `report`
 

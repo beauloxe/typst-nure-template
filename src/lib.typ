@@ -1,7 +1,7 @@
 #import "./shared.typ": universities
 #import "./helpers.typ": *
 
-#import "./style.typ"
+#import "./style/main.typ" as style
 #import "./utils.typ"
 
 #let dstu-table = style.dstu-table

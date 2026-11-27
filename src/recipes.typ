@@ -2,7 +2,7 @@
 // also an example of the constructor approach -- copy its body into your
 // document to take control of any page.
 
-#import "style.typ"
+#import "style/main.typ" as style
 #import "work.typ": work
 #import "parts/common.typ": dstu-bibliography, title-heading
 #import "parts/report/main.typ" as report
