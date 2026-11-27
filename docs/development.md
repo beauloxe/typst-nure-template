@@ -69,8 +69,17 @@ diff <(cd /tmp/before && sha256sum *.png) <(cd /tmp/after && sha256sum *.png)
 typstyle -l 120 -i src tests template
 ```
 
-## Версії
+## Версії та релізи
 
-- Розробка йде в `main`; mise-шаблон бере пакунок з `main` (`nure_package_ref = "main"`).
-- Версія задається в `typst.toml`; ті самі цифри мають бути в імпортах шаблонів і в `nure_package_ver` mise-шаблону (це перевіряє CI).
-- `nure_package_rev` у [template/mise/.mise/config.toml](../template/mise/.mise/config.toml) оновлює хук [.githooks/pre-push](../.githooks/pre-push). Якщо шаблон закріплено на старішому коміті, `git push` у `main` додає коміт «template(mise): pin package to …» і зупиняється, тож треба виконати `git push` ще раз. Увімкнути хук (один раз після клонування): `git config core.hooksPath .githooks`. Пропустити: `git push --no-verify`.
+Пакунок дотримується [SemVer](https://semver.org/) у форматі `MAJOR.MINOR.PATCH` (Typst не приймає суфікси пререлізів у `typst.toml`), а кожна випущена версія вважається незмінною:
+
+- `PATCH` (`0.3.0` → `0.3.1`) -- виправлення помилок, оновлення вбудованих даних, правки без ламання користувацьких документів;
+- `MINOR` (`0.3.x` → `0.4.0`) -- нові можливості, ламаючі зміни API (для `0.x.y`) або підвищення мінімальної версії `compiler` у `typst.toml`.
+
+Як випустити нову версію:
+
+1. Додайте опис змін у секцію `## [Unreleased]` файлу [CHANGELOG.md](../CHANGELOG.md).
+2. Запустіть `./scripts/release.py 0.3.1` -- скрипт оновить версію в `typst.toml`, шаблонах (`template/mise`, `template/default`), `README.md` і актуальній документації (не чіпаючи історичний [migration.md](migration.md)), перенесе `[Unreleased]` у `[0.3.1]` у `CHANGELOG.md`, перевірить компіляцію тестів і шаблонів, створить коміт `chore(release): v0.3.1` та анотований тег `v0.3.1` (для перевірки без коміту -- прапорець `--no-commit`).
+3. Відправте гілку й тег: `git push origin main v0.3.1`.
+4. Workflow [.github/workflows/release.yml](../.github/workflows/release.yml) перевіряє строгий формат тегу `vX.Y.Z` і збіг із `typst.toml` та шаблонами, проганяє тести, збирає `nure-<версія>.tar.gz` із структурою `vendor/nure/<версія>/...`, перевіряє компіляцію `template/mise` і публікує GitHub Release з нотатками із `CHANGELOG.md`.
+5. У шаблонному [template/mise/.mise/mise.lock](../template/mise/.mise/mise.lock) зафіксовані лише зовнішні бінарі (`typst`, `tinymist`, `typstyle`, `dsty`) для основних платформ -- `nure` туди навмисно не записується, щоб уникнути повторних комітів після кожного релізу (у проєкті користувача `mise install` допише `nure` і його `sha256` автоматично). Оновити локфайл бінарів: `cd template/mise && mise lock --platform linux-x64,linux-arm64,macos-arm64,macos-x64,windows-x64 typst tinymist typstyle github:linerds/dsty`.

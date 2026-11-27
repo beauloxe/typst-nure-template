@@ -1,46 +1,34 @@
 [settings]
 quiet = true
-env_shell_expand = true
 lockfile = true
+
+[tool_alias]
+nure = "github:beauloxe/typst-nure-template"
 
 [tools]
 typst = "latest"
 typstyle = "latest"
 tinymist = "latest"
 "github:linerds/dsty" = { version = "latest", prerelease = "true", minimum_release_age = "0" }
+# Версія має збігатися з імпортом `@vendor/nure:<ver>` у src/main.typ.
+# Приклад додавання або зміни версії через CLI:
+#   mise use "nure[asset_pattern=nure-*.tar.gz,strip_components=0]@0.3.0"
+nure = { version = "0.3.0", asset_pattern = "nure-*.tar.gz", strip_components = 0 }
 
 [vars]
-vendor_dir = "{{config_root}}/vendor"
-package_dir = "{{vars.vendor_dir}}/typst-packages"
-
 work_src_dir     = "src"
 work_input_file  = "{{vars.work_src_dir}}/main.typ"
 work_output_file = "{{config_root}}/main.pdf"
 
-# Пакунок: гілка, коміт у ній і версія (= `version` у typst.toml пакунка і в імпорті
-# `@vendor/nure:<ver>`).
-# `mise run update-package-rev` підтягує останній коміт гілки.
-nure_package_repo = "https://github.com/beauloxe/typst-nure-template.git"
-nure_package_ref  = "main"
-nure_package_rev = "a7f49520b6834be2121b6642ebe222fe4aa59f63"
-
-nure_package_name = "vendor/nure"
-nure_package_ver  = "0.3.0"
-
-nure_package_path = "{{vars.package_dir}}/{{vars.nure_package_name}}/{{vars.nure_package_ver}}"
-
 [env]
-TYPST_PACKAGE_DIR  = "{{vars.package_dir}}"
-TYPST_PACKAGE_PATH = "$TYPST_PACKAGE_DIR"
+TYPST_PACKAGE_PATH = { value = "{% if tools.nure is defined %}{{ tools.nure.path }}{% endif %}", tools = true }
 
 [tasks.compile]
 description = "Зібрати src/main.typ у main.pdf"
-depends = ["fetch-nure-package"]
 run = "typst compile {{vars.work_input_file}} {{vars.work_output_file}}"
 
 [tasks.watch]
-description = "Перезбирати main.pdf при кожній зміні"
-depends = ["fetch-nure-package"]
+description = "Перезбирати main.pdf при кожному збереженні"
 run = "typst watch {{vars.work_input_file}} {{vars.work_output_file}}"
 
 [tasks.format]
@@ -49,31 +37,12 @@ run = "typstyle -l 120 -i {{config_root}}/src"
 
 [tasks.lint]
 description = "Перевірити документ за допомогою dsty"
-depends = ["fetch-nure-package"]
 run = "dsty check --full {{config_root}}/src/main.typ"
-
-# Кожен рядок -- окрема команда git, без shell-скрипта, тож працює на будь-якій ОС.
-# `git init` на вже створеному репозиторії нічого не ламає. Задача виконується лише
-# тоді, коли змінився цей файл (наприклад, nure_package_rev), тож `compile` і
-# `watch` не ходять у мережу щоразу.
-[tasks.fetch-nure-package]
-description = "Завантажити пакунок nure потрібної ревізії у vendor/"
-sources = [".mise/config.toml"]
-outputs = { auto = true }
-run = [
-  "git init -q {{vars.nure_package_path}}",
-  "git -C {{vars.nure_package_path}} fetch -q --depth 1 {{vars.nure_package_repo}} {{vars.nure_package_rev}}",
-  "git -C {{vars.nure_package_path}} checkout -q --detach FETCH_HEAD",
-]
 
 # Задачі нижче потребують POSIX-shell (на Windows -- Git Bash).
 [tasks.clean]
 description = "Видалити зібрані PDF"
 run = "rm -vf *.pdf"
-
-[tasks.update-package-rev]
-description = "Оновити nure_package_rev до останнього коміту гілки nure_package_ref"
-run = "mise config set vars.nure_package_rev $(git ls-remote {{vars.nure_package_repo}} refs/heads/{{vars.nure_package_ref}} | cut -f1)"
 
 [tasks.rename]
 description = "Скопіювати main.pdf з назвою на кшталт ЛБ1_Прізвище_КУІБ-24-1_АКС.pdf"

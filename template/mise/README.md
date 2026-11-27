@@ -30,8 +30,8 @@ mise run watch
 | `mise run compile` | Зібрати `main.pdf` один раз |
 | `mise run rename` | Скопіювати PDF з назвою для здачі, напр. `ЛБ1_Косач_КУІБ-24-1_СМП.pdf` |
 | `mise run format` | Відформатувати `src/` |
+| `mise run lint` | Перевірити документ за допомогою `dsty` |
 | `mise run clean` | Видалити PDF |
-| `mise run update-package-rev` | Оновити пакунок до останнього коміту `main` |
 
 ## Документація
 

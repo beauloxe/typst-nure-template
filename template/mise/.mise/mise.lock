@@ -4,33 +4,109 @@
 version = "1.0.0-alpha.7"
 backend = "github:linerds/dsty"
 
+[tools."github:linerds/dsty"."platforms.linux-arm64"]
+checksum = "sha256:6134b5a2e320d6425be8062b9ed24443d4a1db57e7aeadbcafb557b2429287e5"
+url = "https://github.com/linerds/dsty/releases/download/v1.0.0-alpha.7/dsty-v1.0.0-alpha.7-aarch64-unknown-linux-musl.tar.gz"
+url_api = "https://api.github.com/repos/linerds/dsty/releases/assets/792053327"
+
 [tools."github:linerds/dsty"."platforms.linux-x64"]
 checksum = "sha256:3d90bcf5d7c21d66ce79e483df0de6dda2416a8af3bf336703ddac0bf0436d69"
 url = "https://github.com/linerds/dsty/releases/download/v1.0.0-alpha.7/dsty-v1.0.0-alpha.7-x86_64-unknown-linux-musl.tar.gz"
 url_api = "https://api.github.com/repos/linerds/dsty/releases/assets/792053375"
 
+[tools."github:linerds/dsty"."platforms.macos-arm64"]
+checksum = "sha256:e407a8b35bc3e4ac28ff1585399e3be6796722960e7bd22be392ff325e785d59"
+url = "https://github.com/linerds/dsty/releases/download/v1.0.0-alpha.7/dsty-v1.0.0-alpha.7-aarch64-apple-darwin.tar.gz"
+url_api = "https://api.github.com/repos/linerds/dsty/releases/assets/792053317"
+
+[tools."github:linerds/dsty"."platforms.macos-x64"]
+checksum = "sha256:5f3b2dcda863a9e241a92970bc26d0941e36cd7f05740554ef4b6ccb4df3004d"
+url = "https://github.com/linerds/dsty/releases/download/v1.0.0-alpha.7/dsty-v1.0.0-alpha.7-x86_64-apple-darwin.tar.gz"
+url_api = "https://api.github.com/repos/linerds/dsty/releases/assets/792053316"
+
 [[tools.tinymist]]
 version = "0.15.12"
 backend = "aqua:Myriad-Dreamin/tinymist"
+
+[tools.tinymist."platforms.linux-arm64"]
+checksum = "sha256:e85e7eafdc5436638a98c71d88a77f08942de3cc261ec0bcca2672ff85cc8655"
+url = "https://github.com/Myriad-Dreamin/tinymist/releases/download/v0.15.12/tinymist-linux-arm64"
+url_api = "https://api.github.com/repos/Myriad-Dreamin/tinymist/releases/assets/704697496"
 
 [tools.tinymist."platforms.linux-x64"]
 checksum = "sha256:59cd0441dc6789a5715a4e7417ebdb492be07ca3d4ebdf40ade976bea1c1d1ff"
 url = "https://github.com/Myriad-Dreamin/tinymist/releases/download/v0.15.12/tinymist-linux-x64"
 url_api = "https://api.github.com/repos/Myriad-Dreamin/tinymist/releases/assets/704697197"
 
+[tools.tinymist."platforms.macos-arm64"]
+checksum = "sha256:92f1d92e7822be822a054aa29a97b4099439ee907c6676034a5002d572ae2f67"
+url = "https://github.com/Myriad-Dreamin/tinymist/releases/download/v0.15.12/tinymist-darwin-arm64"
+url_api = "https://api.github.com/repos/Myriad-Dreamin/tinymist/releases/assets/704698491"
+
+[tools.tinymist."platforms.macos-x64"]
+checksum = "sha256:1682fa2afbae1a77d8ddad1f4d67a5254d92bbd68004a7c1925693185c0ff928"
+url = "https://github.com/Myriad-Dreamin/tinymist/releases/download/v0.15.12/tinymist-darwin-x64"
+url_api = "https://api.github.com/repos/Myriad-Dreamin/tinymist/releases/assets/704698295"
+
+[tools.tinymist."platforms.windows-x64"]
+checksum = "sha256:c7a2ad09d2f25f18e09f203deda20de1e086b3134fe70a5d163b720e97524af4"
+url = "https://github.com/Myriad-Dreamin/tinymist/releases/download/v0.15.12/tinymist-win32-x64.exe"
+url_api = "https://api.github.com/repos/Myriad-Dreamin/tinymist/releases/assets/704696687"
+
 [[tools.typst]]
 version = "0.15.1"
 backend = "aqua:typst/typst"
 
+[tools.typst."platforms.linux-arm64"]
+checksum = "sha256:5aa8d74a3d906e60ea12a66ac2f37f8eef1b14cbad7182a745e393a10c23dcee"
+url = "https://github.com/typst/typst/releases/download/v0.15.1/typst-aarch64-unknown-linux-musl.tar.xz"
+url_api = "https://api.github.com/repos/typst/typst/releases/assets/480300408"
+
 [tools.typst."platforms.linux-x64"]
 checksum = "sha256:a6d077d0a95eed5a2eba715b2dae06be954f624ccbf85758a03f389ded33118c"
 url = "https://github.com/typst/typst/releases/download/v0.15.1/typst-x86_64-unknown-linux-musl.tar.xz"
+url_api = "https://api.github.com/repos/typst/typst/releases/assets/480300761"
+
+[tools.typst."platforms.macos-arm64"]
+checksum = "sha256:48f62ed034aa3a7978309579ac6ca00045e2ef0da73114e8af27cfd8e74dc05a"
+url = "https://github.com/typst/typst/releases/download/v0.15.1/typst-aarch64-apple-darwin.tar.xz"
+url_api = "https://api.github.com/repos/typst/typst/releases/assets/480299147"
+
+[tools.typst."platforms.macos-x64"]
+checksum = "sha256:7f9fdd9584866245de9a79e0add8f9236fae6f40a8a45e2c4771ccc14db4e0fa"
+url = "https://github.com/typst/typst/releases/download/v0.15.1/typst-x86_64-apple-darwin.tar.xz"
+url_api = "https://api.github.com/repos/typst/typst/releases/assets/480300018"
+
+[tools.typst."platforms.windows-x64"]
+checksum = "sha256:19ce3551153c2fe7ee9fa2f95208310c8f4d3209fedb699e0333faf8913f6736"
+url = "https://github.com/typst/typst/releases/download/v0.15.1/typst-x86_64-pc-windows-msvc.zip"
+url_api = "https://api.github.com/repos/typst/typst/releases/assets/480303335"
 
 [[tools.typstyle]]
 version = "0.15.3"
 backend = "aqua:Enter-tainer/typstyle"
 
+[tools.typstyle."platforms.linux-arm64"]
+checksum = "sha256:3a8bcd929995904b4cd830cd9d6b1e620e5ed5ee9727198b1b5e2cc5f8cd48b8"
+url = "https://github.com/typstyle-rs/typstyle/releases/download/v0.15.3/typstyle-aarch64-unknown-linux-gnu"
+url_api = "https://api.github.com/repos/typstyle-rs/typstyle/releases/assets/751380546"
+
 [tools.typstyle."platforms.linux-x64"]
 checksum = "sha256:e605da8ac55815bd343596210211994af02b54069bfd306f71d07c16542f74c2"
 url = "https://github.com/typstyle-rs/typstyle/releases/download/v0.15.3/typstyle-x86_64-unknown-linux-gnu"
 url_api = "https://api.github.com/repos/typstyle-rs/typstyle/releases/assets/751380101"
+
+[tools.typstyle."platforms.macos-arm64"]
+checksum = "sha256:a895316b606319bf05764402ea151c179d7de496526c4060594c2c1a5edf1224"
+url = "https://github.com/typstyle-rs/typstyle/releases/download/v0.15.3/typstyle-aarch64-apple-darwin"
+url_api = "https://api.github.com/repos/typstyle-rs/typstyle/releases/assets/751380797"
+
+[tools.typstyle."platforms.macos-x64"]
+checksum = "sha256:04255bfcbb80734dfb2b3929cfb76cb9693c72b90ee4c68c931f7988eaff26db"
+url = "https://github.com/typstyle-rs/typstyle/releases/download/v0.15.3/typstyle-x86_64-apple-darwin"
+url_api = "https://api.github.com/repos/typstyle-rs/typstyle/releases/assets/751380315"
+
+[tools.typstyle."platforms.windows-x64"]
+checksum = "sha256:840a9ba38bec7f669434743598c1407f3a5d85cf597c1cd3daa657bb842f4049"
+url = "https://github.com/typstyle-rs/typstyle/releases/download/v0.15.3/typstyle-x86_64-pc-windows-msvc.exe"
+url_api = "https://api.github.com/repos/typstyle-rs/typstyle/releases/assets/751380196"

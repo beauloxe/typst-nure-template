@@ -8,14 +8,14 @@
 
 ## mise (рекомендовано)
 
-[mise](https://mise.jdx.dev/) -- менеджер інструментів. Для кожної роботи він сам встановлює Typst, форматер typstyle, мовний сервер tinymist і завантажує пакунок `nure` зафіксованої ревізії. Глобально нічого ставити не треба, а оновлення Typst чи пакунка не зламає вже зроблені роботи: кожна пам'ятає свої версії.
+[mise](https://mise.jdx.dev/) -- менеджер інструментів. Для кожної роботи він сам встановлює Typst, форматер typstyle, мовний сервер tinymist, лінтер dsty й пакунок `nure` зафіксованої версії. Глобально нічого ставити не треба, а оновлення Typst чи пакунка не зламає вже зроблені роботи: кожна пам'ятає свої версії.
 
 ### Нова робота
 
-1. Встановіть [mise](https://mise.jdx.dev/getting-started.html) і `git`.
+1. Встановіть [mise](https://mise.jdx.dev/getting-started.html) (і `git`, щоб скопіювати шаблон).
 2. Скопіюйте шаблон роботи:
    ```sh
-   git clone --depth 1 -b main https://github.com/beauloxe/typst-nure-template.git nure-template
+   git clone --depth 1 -b v0.3.0 https://github.com/beauloxe/typst-nure-template.git nure-template
    cp -r nure-template/template/mise lb1
    ```
    На Windows (PowerShell) замість `cp`: `Copy-Item -Recurse nure-template\template\mise lb1`.
@@ -25,8 +25,8 @@
    ```sh
    cd lb1
    mise trust      # дозволити mise виконувати задачі з цієї теки
-   mise install    # встановити Typst та інші інструменти
-   mise run watch  # завантажити пакунок і перезбирати main.pdf при кожному збереженні
+   mise install    # встановити Typst, інші інструменти й пакунок nure
+   mise run watch  # перезбирати main.pdf при кожному збереженні
    ```
 4. Впишіть свої дані в `src/doc.toml` (див. [Дані роботи](data.md)), тип, номер і тему -- на початку `src/main.typ`, і пишіть текст (див. [Лабораторна чи практична](lab.md)).
 
@@ -36,8 +36,7 @@
 lb1/
 ├── .mise/
 │   ├── config.toml   -- інструменти, версія пакунка, задачі
-│   └── mise.lock     -- точні версії інструментів
-├── vendor/           -- пакунок nure (завантажується сам, у git не потрапляє)
+│   └── mise.lock     -- точні версії й контрольні суми інструментів і пакунка
 ├── main.pdf          -- результат
 └── src/
     ├── doc.toml      -- спільні дані: дисципліна, автори, викладачі
@@ -59,11 +58,10 @@ Typst бачить лише теку `src/`: файли поза нею (`../щ�
 | `mise run compile` | Зібрати `main.pdf` один раз |
 | `mise run rename` | Зібрати й скопіювати PDF з назвою для здачі, напр. `ЛБ1_Косач_КУІБ-24-1_СМП.pdf` |
 | `mise run format` | Відформатувати код у `src/` |
+| `mise run lint` | Перевірити документ за допомогою `dsty` |
 | `mise run clean` | Видалити зібрані PDF |
-| `mise run update-package-rev` | Оновити пакунок до останньої ревізії тієї ж версії |
-| `mise run fetch-nure-package` | Завантажити пакунок (запускається сам перед `compile` і `watch`) |
 
-`mise tasks` показує цей самий список. `clean`, `rename` і `update-package-rev` потребують POSIX-shell -- на Windows це Git Bash; решта працює всюди.
+`mise tasks` показує цей самий список. `clean` і `rename` потребують POSIX-shell -- на Windows це Git Bash; решта працює всюди.
 
 ### Редактор
 
@@ -77,18 +75,31 @@ Tinymist шукає пакунок `@vendor/nure` через змінну `TYPST
 
 ### Оновлення пакунка
 
-Версія задається у `[vars]` файлу `.mise/config.toml`:
+Пакунок `nure` встановлюється з GitHub Releases як звичайний інструмент mise у спільне сховище (`~/.local/share/mise/installs/nure/<ver>`). Версія задається у `[tools]` файлу `.mise/config.toml`:
 
 ```toml
-nure_package_ref = "main"        # гілка репозиторію
-nure_package_rev = "828a058..."  # конкретний коміт у ній
-nure_package_ver = "0.3.0"       # версія пакунка (`version` у його typst.toml)
+nure = { version = "0.3.0", asset_pattern = "nure-*.tar.gz", strip_components = 0 }
 ```
 
-- **Оновлення:** `mise run update-package-rev` -- `nure_package_rev` оновиться до останнього коміту `main`, наступний `compile` завантажить його.
-- **Нова версія:** якщо після оновлення в `main` змінилася `version` у `typst.toml` (напр. на `0.4.0`), змініть `nure_package_ver = "0.4.0"` і версію в імпорті: `#import "@vendor/nure:0.4.0": *`. Перед цим прочитайте [Перехід зі старих версій](migration.md).
+Щоб перейти на новий реліз (наприклад, `0.3.1` або `0.4.0`):
+1. Перевірте доступні релізи: `mise ls-remote nure` (перед переходом на нову мінорну версію прочитайте [Перехід зі старих версій](migration.md)).
+2. Змініть версію `nure` у `.mise/config.toml` і в імпорті `src/main.typ`: `#import "@vendor/nure:0.3.1": *`.
+3. Виконайте `mise install`.
 
-Здані роботи краще не оновлювати: вони й так збиратимуться на своїй ревізії.
+Старі версії пакунка, які більше не використовує жодна робота, прибирає `mise prune`. Здані роботи краще не оновлювати: вони й так збиратимуться на своїй версії.
+
+### Підключення в наявний mise-проєкт
+
+Якщо у вас уже є власний `mise.toml` і ви не копіюєте `template/mise`, підключіть пакунок через CLI:
+
+```sh
+mise config set tool_alias.nure "github:beauloxe/typst-nure-template"
+mise config set --type string env.TYPST_PACKAGE_PATH.value '{% if tools.nure is defined %}{{ tools.nure.path }}{% endif %}'
+mise config set --type bool env.TYPST_PACKAGE_PATH.tools true
+mise use "nure[asset_pattern=nure-*.tar.gz,strip_components=0]@0.3.0"
+```
+
+Після цього в документі працюватиме `#import "@vendor/nure:0.3.0": *`, а `mise` зафіксує версію й `sha256` у вашому `mise.lock`.
 
 ## Локальний пакунок Typst
 
@@ -97,27 +108,18 @@ nure_package_ver = "0.3.0"       # версія пакунка (`version` у й�
 ### Linux і macOS
 
 ```sh
-git clone -b main https://github.com/beauloxe/typst-nure-template.git ~/.local/share/typst/packages/local/nure/0.3.0
+git clone --depth 1 -b v0.3.0 https://github.com/beauloxe/typst-nure-template.git ~/.local/share/typst/packages/local/nure/0.3.0
 ```
 
 На macOS тека пакунків -- `~/Library/Application Support/typst/packages/local/nure/0.3.0`.
 
 ### Windows
 
-Найзручніше склонувати репозиторій у звичне місце і поставити на нього символьне посилання з теки пакунків -- тоді для оновлення достатньо `git pull`.
+```powershell
+git clone --depth 1 -b v0.3.0 https://github.com/beauloxe/typst-nure-template.git "$env:APPDATA\typst\packages\local\nure\0.3.0"
+```
 
-1. Склонуйте репозиторій (наприклад, у «Документи»):
-   ```powershell
-   cd $HOME\Documents
-   git clone -b main https://github.com/beauloxe/typst-nure-template.git
-   ```
-2. Відкрийте PowerShell від імені адміністратора («Пуск» → PowerShell → правою кнопкою → «Запуск від імені адміністратора») і виконайте:
-   ```powershell
-   New-Item -ItemType Directory -Force -Path "$env:APPDATA\typst\packages\local\nure"
-   New-Item -ItemType SymbolicLink -Path "$env:APPDATA\typst\packages\local\nure\0.3.0" -Target "$HOME\Documents\typst-nure-template"
-   ```
-
-Версія в назві теки (`0.3.0`) має збігатися з `version` у `typst.toml` пакунка, інакше Typst його не завантажить.
+Версія в назві теки (`0.3.0`) має збігатися з `version` у `typst.toml` пакунка, інакше Typst його не завантажить. Для нової версії (наприклад, `0.3.1`) просто склонуйте відповідний тег у сусідню теку `0.3.1` -- старі роботи продовжать збиратися на `0.3.0`.
 
 ### Нова робота
 

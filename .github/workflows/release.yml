@@ -1,0 +1,128 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - "v*"
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Install Typst
+        uses: typst-community/setup-typst@v4
+
+      - name: Verify tag is strict SemVer and matches typst.toml
+        run: |
+          if [[ ! "$GITHUB_REF_NAME" =~ ^v[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
+            echo "::error::Tag $GITHUB_REF_NAME is not strict SemVer (expected vMAJOR.MINOR.PATCH)"
+            exit 1
+          fi
+          tag_version="${GITHUB_REF_NAME#v}"
+          pkg_version=$(sed -n 's/^version = "\(.*\)"/\1/p' typst.toml)
+          if [ "$tag_version" != "$pkg_version" ]; then
+            echo "::error::Tag $GITHUB_REF_NAME does not match typst.toml version $pkg_version"
+            exit 1
+          fi
+          echo "PKG_VERSION=$pkg_version" >> "$GITHUB_ENV"
+
+      - name: Check templates target this version
+        run: |
+          grep -Eq "^nure *= *\{ *version *= *\"$PKG_VERSION\"" template/mise/.mise/config.toml \
+            || { echo "::error::template/mise/.mise/config.toml: nure tool version is not $PKG_VERSION"; exit 1; }
+          for file in template/mise/src/*.typ; do
+            if grep -q '@vendor/nure:' "$file" && ! grep -q "@vendor/nure:$PKG_VERSION\"" "$file"; then
+              echo "::error::$file imports a nure version other than $PKG_VERSION"
+              exit 1
+            fi
+          done
+          for file in template/default/*.typ; do
+            if grep -q '@local/nure:' "$file" && ! grep -q "@local/nure:$PKG_VERSION\"" "$file"; then
+              echo "::error::$file imports a nure version other than $PKG_VERSION"
+              exit 1
+            fi
+          done
+
+      - name: Compile template fixtures
+        run: |
+          mkdir -p build
+          for test in tests/*.typ; do
+            name=$(basename "$test" .typ)
+            typst compile --root . "$test" "build/$name.pdf"
+          done
+
+      - name: Compare constructor documents with recipes
+        run: |
+          status=0
+          for test in tests/constructor-*.typ; do
+            name=$(basename "$test" .typ)
+            recipe=${name#constructor-}
+            [ -f "tests/$recipe.typ" ] || continue
+            for doc in "$name" "$recipe"; do
+              mkdir -p "build/png/$doc"
+              typst compile --root . --ppi 72 "tests/$doc.typ" "build/png/$doc/p{0p}.png"
+            done
+            if diff <(cd "build/png/$recipe" && sha256sum *.png) <(cd "build/png/$name" && sha256sum *.png); then
+              echo "$name renders identically to $recipe"
+            else
+              echo "::error::$name differs from $recipe"
+              status=1
+            fi
+          done
+          exit $status
+
+      - name: Build release archive
+        run: |
+          stage=$(mktemp -d)
+          pkg_root="$stage/vendor/nure/$PKG_VERSION"
+          mkdir -p "$pkg_root/template/default"
+          cp -R typst.toml LICENSE src "$pkg_root/"
+          cp template/default/*.typ template/default/bibl.yml "$pkg_root/template/default/"
+          tar -czf "nure-${PKG_VERSION}.tar.gz" -C "$stage" vendor
+
+      - name: Verify release archive compiles mise template
+        run: |
+          unpacked=$(mktemp -d)
+          tar -xzf "nure-${PKG_VERSION}.tar.gz" -C "$unpacked"
+          TYPST_PACKAGE_PATH="$unpacked" typst compile template/mise/src/main.typ /tmp/mise-release-check.pdf
+
+      - name: Extract release notes from CHANGELOG.md
+        run: |
+          python3 - "$PKG_VERSION" <<'PY' > /tmp/release-notes.md
+          import re, sys
+          from pathlib import Path
+
+          ver = sys.argv[1]
+          changelog = Path("CHANGELOG.md")
+          if not changelog.exists():
+              sys.exit(0)
+
+          text = changelog.read_text(encoding="utf-8")
+          m = re.search(rf"^## \[{re.escape(ver)}\][^\n]*\n(.*?)(?=^## \[|^\[|\Z)", text, re.M | re.S)
+          if m:
+              print(m.group(1).strip())
+          PY
+
+      - name: Publish GitHub Release
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          asset="nure-${PKG_VERSION}.tar.gz"
+          if gh release view "$GITHUB_REF_NAME" >/dev/null 2>&1; then
+            gh release upload "$GITHUB_REF_NAME" "$asset" --clobber
+            if [ -s /tmp/release-notes.md ]; then
+              gh release edit "$GITHUB_REF_NAME" --notes-file /tmp/release-notes.md
+            fi
+          else
+            if [ -s /tmp/release-notes.md ]; then
+              gh release create "$GITHUB_REF_NAME" "$asset" --title "$GITHUB_REF_NAME" --notes-file /tmp/release-notes.md
+            else
+              gh release create "$GITHUB_REF_NAME" "$asset" --title "$GITHUB_REF_NAME" --generate-notes
+            fi
+          fi
